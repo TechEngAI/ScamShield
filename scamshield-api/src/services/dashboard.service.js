@@ -1,4 +1,11 @@
 const { supabaseAdmin } = require('../config/supabase');
+const logger = require('../utils/logger');
+
+const bankLeaderboardCache = {
+  data: null,
+  fetchedAt: 0,
+  CACHE_DURATION: 2 * 60 * 1000, // 2 minutes
+};
 
 function applyUserScope(query, user) {
   if (user?.role === 'admin') {
@@ -139,8 +146,68 @@ async function getDashboardRecent(user) {
   }
 }
 
+/**
+ * Returns ranked list of most impersonated Nigerian banks
+ * @returns {Promise<Array>} Array of { bank_name, count, percentage } objects
+ */
+async function getBankImpersonationLeaderboard() {
+  const now = Date.now();
+
+  // Return cached data if still valid
+  if (bankLeaderboardCache.data && now - bankLeaderboardCache.fetchedAt < bankLeaderboardCache.CACHE_DURATION) {
+    logger.info('Returning cached bank leaderboard data');
+    return { success: true, data: bankLeaderboardCache.data };
+  }
+
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('scam_checks')
+      .select('impersonated_bank')
+      .not('impersonated_bank', 'is', null)
+      .eq('verdict', 'scam');
+
+    if (error) {
+      logger.error('Failed to fetch bank impersonation data', { error: error.message });
+      return { success: false, message: error.message || 'failed to fetch bank leaderboard' };
+    }
+
+    // Count occurrences of each bank
+    const bankCounts = {};
+    (data || []).forEach((row) => {
+      if (row.impersonated_bank) {
+        bankCounts[row.impersonated_bank] = (bankCounts[row.impersonated_bank] || 0) + 1;
+      }
+    });
+
+    // Calculate total for percentage calculation
+    const total = Object.values(bankCounts).reduce((sum, count) => sum + count, 0);
+
+    // Convert to array and sort by count descending
+    const leaderboard = Object.entries(bankCounts)
+      .map(([bank_name, count]) => ({
+        bank_name,
+        count,
+        percentage: total > 0 ? Math.round((count / total) * 100 * 10) / 10 : 0, // Round to 1 decimal
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10); // Top 10
+
+    // Cache the result
+    bankLeaderboardCache.data = leaderboard;
+    bankLeaderboardCache.fetchedAt = now;
+
+    logger.info('Bank leaderboard fetched successfully', { count: leaderboard.length });
+
+    return { success: true, data: leaderboard };
+  } catch (error) {
+    logger.error('Exception fetching bank leaderboard', { error: error.message });
+    return { success: false, message: error.message || 'failed to fetch bank leaderboard' };
+  }
+}
+
 module.exports = {
   getDashboardStats,
   getDashboardRecent,
   getDashboardCategories,
+  getBankImpersonationLeaderboard,
 };

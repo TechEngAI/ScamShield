@@ -7,6 +7,7 @@ import useAuth from "../../hooks/useAuth";
 const navItems = [
   { to: "/dashboard", label: "Dashboard" },
   { to: "/check", label: "Check Scam" },
+  { to: "/bulk", label: "Bulk Check" },
   { to: "/history", label: "History" },
 ];
 

@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/layout/Navbar";
 import ProtectedRoute from "./components/layout/ProtectedRoute";
+import BulkCheckPage from "./pages/BulkCheckPage";
 import CheckScamPage from "./pages/CheckScamPage";
 import DashboardPage from "./pages/DashboardPage";
 import HistoryPage from "./pages/HistoryPage";
@@ -22,6 +23,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/check" element={<CheckScamPage />} />
+          <Route path="/bulk" element={<BulkCheckPage />} />
           <Route path="/history" element={<HistoryPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

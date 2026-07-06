@@ -36,8 +36,18 @@ function validateTwilioSignature(req, res, next) {
   }
 
   const signature = req.headers['x-twilio-signature'];
+
+  // Build the full URL - TWILIO_WEBHOOK_URL should be base URL only (no path)
+  // The path comes from req.originalUrl
   const url = `${config.TWILIO_WEBHOOK_URL}${req.originalUrl}`;
   const params = req.body;
+
+  // Log for debugging
+  logger.info('Twilio signature validation', {
+    hasSignature: !!signature,
+    url,
+    messageSid: req.body.MessageSid
+  });
 
   // Use Twilio's validateRequest method
   const isValid = twilio.validateRequest(
@@ -83,7 +93,7 @@ async function sendWhatsAppMessage(to, body) {
 
   try {
     const message = await client.messages.create({
-     from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
+      from: `whatsapp:${config.TWILIO_WHATSAPP_NUMBER}`,
       to: to,
       body: messageBody
     });

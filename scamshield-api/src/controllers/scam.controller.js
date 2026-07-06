@@ -261,3 +261,80 @@ exports.checkImageScam = asyncHandler(async (req, res) => {
 
   return sendSuccess(res, responseData, 'image analysed successfully');
 });
+
+/**
+ * Bulk scam check - analyse multiple messages at once
+ */
+exports.checkBulkScam = asyncHandler(async (req, res) => {
+  const { messages } = req.body;
+  const userId = req.user?.id || null;
+
+  console.log('Bulk scam check request:', { messageCount: messages?.length, userId });
+
+  // Process all messages in parallel
+  const results = await Promise.allSettled(
+    messages.map(async (messageText, index) => {
+      const analysis = await scamService.analyzeMessage(messageText, userId);
+
+      // Save each to database
+      const { data: saved, error: insertError } = await supabaseAdmin
+        .from('scam_checks')
+        .insert({
+          user_id: userId,
+          message_text: messageText,
+          verdict: analysis.verdict,
+          confidence_score: Math.round(analysis.confidence_score),
+          scam_category: analysis.scam_category || null,
+          impersonated_bank: analysis.impersonated_bank || null,
+          explanation: analysis.explanation,
+          language_detected: analysis.language_detected,
+          red_flags: Array.isArray(analysis.red_flags) ? analysis.red_flags : [],
+          safe_to_click: typeof analysis.safe_to_click === 'boolean' ? analysis.safe_to_click : true,
+          recommended_action: analysis.recommended_action || null,
+          source: 'web'
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        logger.error('Failed to save bulk scam check result', { error: insertError.message, index });
+      }
+
+      return {
+        index,
+        message_preview: messageText.substring(0, 60) + (messageText.length > 60 ? '...' : ''),
+        ...analysis,
+        id: saved?.id || null
+      };
+    })
+  );
+
+  // Separate successful and failed results
+  const processed = results.map((result, index) => {
+    if (result.status === 'fulfilled') {
+      return result.value;
+    } else {
+      logger.error('Bulk scam check failed for message', { index, error: result.reason?.message });
+      return {
+        index,
+        message_preview: messages[index].substring(0, 60) + '...',
+        verdict: 'error',
+        error: 'Failed to analyse this message',
+        confidence_score: 0
+      };
+    }
+  });
+
+  // Summary stats
+  const summary = {
+    total: processed.length,
+    scams: processed.filter(r => r.verdict === 'scam').length,
+    safe: processed.filter(r => r.verdict === 'safe').length,
+    suspicious: processed.filter(r => r.verdict === 'suspicious').length,
+    errors: processed.filter(r => r.verdict === 'error').length
+  };
+
+  console.log('Bulk scam check completed:', summary);
+
+  return sendSuccess(res, { results: processed, summary }, 'bulk analysis complete');
+});

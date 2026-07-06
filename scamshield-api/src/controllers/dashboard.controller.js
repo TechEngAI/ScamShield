@@ -32,7 +32,7 @@ exports.getRecent = asyncHandler(async (req, res) => {
 
 exports.getCategories = asyncHandler(async (req, res) => {
   console.log('Dashboard categories request:', { userId: req.user?.id, user: req.user });
-  
+
   const result = await dashboardService.getDashboardCategories(req.user);
 
   console.log('Dashboard categories result:', result);
@@ -42,4 +42,18 @@ exports.getCategories = asyncHandler(async (req, res) => {
   }
 
   return sendSuccess(res, result.data, 'Dashboard categories retrieved', 200);
+});
+
+exports.getBankLeaderboard = asyncHandler(async (req, res) => {
+  console.log('Bank leaderboard request:', { userId: req.user?.id, user: req.user });
+
+  const result = await dashboardService.getBankImpersonationLeaderboard();
+
+  console.log('Bank leaderboard result:', result);
+
+  if (!result.success) {
+    return sendError(res, result.message, result.statusCode || 400, result.errors || null);
+  }
+
+  return sendSuccess(res, result.data, 'bank leaderboard retrieved successfully', 200);
 });

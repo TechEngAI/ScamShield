@@ -22,7 +22,22 @@ function createRateLimiter(options = {}) {
   });
 }
 
-const generalLimiter = createRateLimiter();
+const generalLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 500, // Increased from 100 to 500
+});
+
+// Dashboard limiter — more lenient for dashboard endpoints
+const dashboardLimiter = createRateLimiter({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 200, // Allow 200 requests per minute for dashboard
+});
+
+// History limiter — for scam history endpoint
+const historyLimiter = createRateLimiter({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 100, // Allow 100 requests per minute for history
+});
 
 // Auth limiter — for OTP send and verify endpoints
 const authLimiter = rateLimit({
@@ -45,6 +60,8 @@ const scamCheckLimiter = rateLimit({
 module.exports = {
   createRateLimiter,
   generalLimiter,
+  dashboardLimiter,
+  historyLimiter,
   authLimiter,
   scamCheckLimiter,
 };

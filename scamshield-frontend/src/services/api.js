@@ -161,4 +161,14 @@ export async function getDashboardCategories() {
   return unwrap(response);
 }
 
+export async function getBankLeaderboard() {
+  const response = await api.get("/api/dashboard/banks");
+  return unwrap(response);
+}
+
+export async function checkBulkScam(messages) {
+  const response = await api.post("/api/scam/check-bulk", { messages });
+  return unwrap(response);
+}
+
 export default api;

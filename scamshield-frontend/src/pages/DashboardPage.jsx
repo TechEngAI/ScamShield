@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { AlertTriangle, CheckCircle2, History, Search, ShieldX, TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import useAuth from "../hooks/useAuth";
-import { getDashboardCategories, getDashboardRecent, getDashboardStats, getErrorMessage } from "../services/api";
+import { getBankLeaderboard, getDashboardCategories, getDashboardRecent, getDashboardStats, getErrorMessage } from "../services/api";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import VerdictBadge from "../components/ui/VerdictBadge";
 
@@ -44,6 +44,7 @@ function DashboardPage() {
   const [stats, setStats] = useState(null);
   const [recent, setRecent] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [bankLeaderboard, setBankLeaderboard] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -60,16 +61,18 @@ function DashboardPage() {
       setIsLoading(true);
       setError("");
       try {
-        const [statsData, recentData, categoryData] = await Promise.all([
+        const [statsData, recentData, categoryData, bankData] = await Promise.all([
           getDashboardStats(),
           getDashboardRecent(),
           getDashboardCategories(),
+          getBankLeaderboard(),
         ]);
 
         if (!isMounted) return;
         setStats(statsData);
         setRecent(normalizeList(recentData).slice(0, 10));
         setCategories(normalizeCategories(categoryData));
+        setBankLeaderboard(Array.isArray(bankData) ? bankData : []);
       } catch (requestError) {
         if (isMounted) {
           setError(getErrorMessage(requestError, "Could not load dashboard data."));
@@ -267,6 +270,56 @@ function DashboardPage() {
                 </div>
               </div>
             </section>
+
+            {/* Bank Impersonation Leaderboard */}
+            {isLoading ? (
+              <section className="mt-6 rounded-xl border border-slate-800 bg-slate-900 p-6">
+                <div className="mb-5">
+                  <h2 className="text-lg font-bold text-white">🏦 Most Impersonated Banks</h2>
+                  <p className="text-sm text-slate-400 mt-1">Banks most frequently targeted by scammers</p>
+                </div>
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="skeleton h-4 w-24 bg-slate-800 rounded"></div>
+                      <div className="flex-1 bg-slate-800 rounded-full h-3"></div>
+                      <div className="skeleton h-4 w-12 bg-slate-800 rounded"></div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ) : bankLeaderboard.length > 0 ? (
+              <section className="mt-6 rounded-xl border border-slate-800 bg-slate-900 p-6">
+                <div className="mb-5">
+                  <h2 className="text-lg font-bold text-white">🏦 Most Impersonated Banks</h2>
+                  <p className="text-sm text-slate-400 mt-1">Banks most frequently targeted by scammers</p>
+                </div>
+                <div className="space-y-3">
+                  {bankLeaderboard.map((bank) => (
+                    <div key={bank.bank_name} className="flex items-center gap-3">
+                      <span className="text-slate-300 text-sm w-24 flex-shrink-0">{bank.bank_name}</span>
+                      <div className="flex-1 bg-slate-700 rounded-full h-3">
+                        <div
+                          className="bg-red-500 h-3 rounded-full transition-all duration-700"
+                          style={{ width: `${bank.percentage}%` }}
+                        />
+                      </div>
+                      <span className="text-red-400 text-sm font-medium w-12 text-right">{bank.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ) : (
+              <section className="mt-6 rounded-xl border border-slate-800 bg-slate-900 p-6">
+                <div className="mb-5">
+                  <h2 className="text-lg font-bold text-white">🏦 Most Impersonated Banks</h2>
+                  <p className="text-sm text-slate-400 mt-1">Banks most frequently targeted by scammers</p>
+                </div>
+                <div className="flex items-center justify-center rounded-lg bg-slate-950 p-6 text-sm font-semibold text-slate-500">
+                  No bank impersonation data yet. Check more messages to see patterns.
+                </div>
+              </section>
+            )}
           </>
         )}
       </div>

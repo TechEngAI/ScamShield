@@ -3,7 +3,7 @@ const { body, query } = require('express-validator');
 const authMiddleware = require('../middleware/auth.middleware');
 const validate = require('../middleware/validate.middleware');
 const scamController = require('../controllers/scam.controller');
-const { scamCheckLimiter } = require('../middleware/rateLimit.middleware');
+const { scamCheckLimiter, historyLimiter } = require('../middleware/rateLimit.middleware');
 const { upload } = require('../middleware/upload.middleware');
 
 const router = express.Router();
@@ -28,9 +28,27 @@ router.post(
   scamController.checkImageScam
 );
 
+router.post(
+  '/check-bulk',
+  authMiddleware.optional,
+  scamCheckLimiter,
+  [
+    body('messages')
+      .isArray({ min: 1, max: 5 })
+      .withMessage('provide between 1 and 5 messages'),
+    body('messages.*')
+      .isString()
+      .isLength({ min: 10, max: 2000 })
+      .withMessage('each message must be between 10 and 2000 characters'),
+  ],
+  validate,
+  scamController.checkBulkScam
+);
+
 router.get(
   '/history',
   authMiddleware,
+  historyLimiter,
   [
     query('page').optional().isInt({ min: 1 }).toInt(),
     query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
@@ -40,6 +58,6 @@ router.get(
   scamController.getHistory
 );
 
-router.get('/patterns', authMiddleware, scamController.getPatterns);
+router.get('/patterns', authMiddleware, historyLimiter, scamController.getPatterns);
 
 module.exports = router;

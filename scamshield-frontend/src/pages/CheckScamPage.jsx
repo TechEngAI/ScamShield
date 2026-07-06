@@ -32,6 +32,34 @@ const languageLabels = {
   mixed: "Mixed",
 };
 
+const getConfidenceExplanation = (score, verdict, redFlags) => {
+  const flagCount = redFlags?.length || 0;
+
+  if (verdict === 'scam') {
+    if (score >= 90) {
+      return `Our AI is ${score}% confident this is a scam because it matches ${flagCount} high-severity Nigerian fraud patterns in our database. Do not engage with this message under any circumstances.`;
+    } else if (score >= 70) {
+      return `Our AI is ${score}% confident this is a scam. It matches ${flagCount} known fraud patterns. Treat with extreme caution.`;
+    } else {
+      return `Our AI suspects this may be a scam (${score}% confidence). Some patterns match known Nigerian fraud templates but the message is ambiguous. Verify through official channels.`;
+    }
+  }
+
+  if (verdict === 'suspicious') {
+    return `This message has ${flagCount} suspicious element${flagCount !== 1 ? 's' : ''} that match partial fraud patterns (${score}% risk score). We cannot confirm it is a scam but recommend caution.`;
+  }
+
+  if (verdict === 'safe') {
+    if (score >= 80) {
+      return `Our AI found no scam patterns in this message (${score}% confidence it is safe). It does not match any of our 100+ Nigerian fraud templates.`;
+    } else {
+      return `This message appears safe (${score}% confidence) but our certainty is moderate. When in doubt, contact your bank through official channels.`;
+    }
+  }
+
+  return `Confidence score: ${score}%`;
+};
+
 function CheckScamPage() {
   const [activeTab, setActiveTab] = useState("text");
   const [messageText, setMessageText] = useState("");
@@ -360,6 +388,13 @@ function CheckScamPage() {
             <div className="mt-6">
               <p className="mb-2 text-sm font-bold text-slate-300">Confidence score</p>
               <ConfidenceBar score={Number(result.confidence_score) || 0} />
+              <p className="text-slate-400 text-sm mt-2 leading-relaxed italic">
+                {getConfidenceExplanation(
+                  result.confidence_score,
+                  result.verdict,
+                  result.red_flags
+                )}
+              </p>
             </div>
 
             <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_0.85fr]">
@@ -367,23 +402,34 @@ function CheckScamPage() {
                 <h2 className="text-lg font-bold text-white">Explanation</h2>
                 <p className="mt-2 leading-7 text-slate-400">{result.explanation}</p>
 
-                <h3 className="mt-6 text-sm font-bold uppercase tracking-wide text-slate-500">Red flags</h3>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {result.red_flags?.length ? (
-                    result.red_flags.map((flag) => (
-                      <span
-                        key={flag}
-                        className="rounded-lg bg-red-950 border border-red-800 px-3 py-1.5 text-xs font-semibold text-red-400"
-                      >
-                        {flag}
-                      </span>
-                    ))
-                  ) : (
-                    <span className="rounded-lg bg-green-950 border border-green-800 px-3 py-1.5 text-xs font-semibold text-green-400">
+                {result.red_flags && result.red_flags.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-slate-400 text-xs uppercase tracking-wide mb-2 font-medium">
+                      🚩 Red Flags Detected ({result.red_flags.length})
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {result.red_flags.map((flag, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-950 text-red-400 border border-red-800 text-xs font-medium"
+                        >
+                          ⚠ {flag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {(!result.red_flags || result.red_flags.length === 0) && (
+                  <div className="mt-4">
+                    <p className="text-slate-400 text-xs uppercase tracking-wide mb-2 font-medium">
+                      ✅ No Red Flags Detected
+                    </p>
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-950 text-green-400 border border-green-800 text-xs font-medium">
                       No major red flags detected
                     </span>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
 
               <aside className={`rounded-lg border p-5 ${actionClasses[result.verdict] || actionClasses.suspicious}`}>
