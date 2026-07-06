@@ -1,0 +1,86 @@
+# ScamShield NG - Supabase Configuration
+# Generated for development and production
+
+[project]
+# Project configuration
+name = "scamshield-ng"
+
+[api]
+# API configuration
+max_rows = 1000
+# Set this lower if you need stricter limits
+# Also consider RLS policies for security
+
+[database]
+# PostgreSQL database configuration
+port = 5432
+max_connections = 20
+# Adjust based on expected concurrent connections
+
+[auth]
+# Authentication settings
+site_url = "http://localhost:3000"
+# Production: set to https://yourdomain.com
+
+additional_redirect_urls = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "https://yourdomain.com"
+]
+
+# Enable JWT auto refresh
+jwt_expiry_secs = 3600
+# 1 hour default
+
+[auth.email]
+# Email authentication configuration
+enable_signup = true
+double_confirm_changes = false
+enable_confirmations = false
+# OTP handles confirmation, no need for email confirmation
+
+[functions]
+# Edge Functions configuration
+memory_size = 256
+timeout_sec = 600
+# 10 minute timeout for long-running operations
+
+[[functions.node_loader]]
+# Node.js runtime for TypeScript functions
+runtime_version = "18"
+
+# Environment variables accessible to Edge Functions
+# These should be set in environment_variables or via CLI
+
+[cors]
+# CORS settings for Edge Functions
+allowed_origins = [
+  "http://localhost:3000",
+  "http://localhost:3001"
+]
+# Production: add your domain here
+
+[realtime]
+# Realtime subscriptions configuration
+max_bytes_per_second = 100
+
+[realtime.max_concurrent_users]
+# Adjust based on expected users
+concurrent_users = 1000
+
+[storage]
+# File storage configuration (if needed for uploads)
+file_size_limit_mbytes = 50
+# Adjust based on requirements
+
+[[storage.buckets]]
+id = "scam_reports"
+name = "scam_reports"
+public = false
+# Private bucket for user-submitted evidence
+
+[[storage.cors]]
+# CORS configuration for storage
+AllowedMethods = ["GET", "PUT", "POST", "DELETE"]
+AllowedOrigins = ["*"]
+AllowedHeaders = ["*"]

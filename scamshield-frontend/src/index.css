@@ -1,0 +1,136 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #0F172A;
+  color: #F8FAFC;
+  margin: 0;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #1E293B;
+}
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #64748B;
+}
+
+/* Result slide-up animation */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s ease-out forwards;
+}
+
+/* Glow effects for verdict */
+.glow-red {
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.25);
+}
+.glow-green {
+  box-shadow: 0 0 20px rgba(22, 163, 74, 0.25);
+}
+.glow-amber {
+  box-shadow: 0 0 20px rgba(217, 119, 6, 0.25);
+}
+
+/* Dot grid pattern for hero */
+.dot-grid {
+  background-image: radial-gradient(circle, #334155 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #3B82F6 0%, #06B6D4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card hover effect */
+.card-hover {
+  transition: all 0.2s ease;
+}
+.card-hover:hover {
+  border-color: #3B82F6;
+  transform: translateY(-2px);
+}
+
+/* Button base styles */
+.btn-base {
+  transition: all 0.2s ease;
+}
+.btn-base:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+.btn-base:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Input focus ring */
+.input-focus:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #3B82F6;
+  ring-offset: 2px;
+  ring-offset-color: #1E293B;
+}
+
+/* Skeleton loading animation */
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.skeleton {
+  animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Mobile menu slide down */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-menu-animate {
+  animation: slideDown 0.2s ease-out;
+}
