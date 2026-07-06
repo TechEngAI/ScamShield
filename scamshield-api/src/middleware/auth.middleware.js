@@ -35,9 +35,12 @@ async function optionalAuth(req, _res, next) {
   const token = getBearerToken(req);
 
   if (!token) {
+    console.log('Optional auth: No token provided');
     req.user = null;
     return next();
   }
+
+  console.log('Optional auth: Token provided, validating...');
 
   const {
     data: { user },
@@ -45,20 +48,28 @@ async function optionalAuth(req, _res, next) {
   } = await supabaseAdmin.auth.getUser(token);
 
   if (error || !user) {
+    console.log('Optional auth: Invalid token', { error: error?.message });
     req.user = null;
     return next();
   }
 
+  console.log('Optional auth: Token valid, loading profile...');
   req.user = await loadProfile(user);
+  console.log('Optional auth: User loaded', { userId: req.user?.id });
   return next();
 }
 
 async function authMiddleware(req, res, next) {
   const token = getBearerToken(req);
 
+  console.log('Auth middleware: Checking token...');
+
   if (!token) {
+    console.log('Auth middleware: No token provided');
     return sendError(res, 'authorization required', 401);
   }
+
+  console.log('Auth middleware: Token provided, validating...');
 
   const {
     data: { user },
@@ -66,11 +77,14 @@ async function authMiddleware(req, res, next) {
   } = await supabaseAdmin.auth.getUser(token);
 
   if (error || !user) {
+    console.log('Auth middleware: Invalid token', { error: error?.message });
     return sendError(res, 'invalid or expired token', 401);
   }
 
+  console.log('Auth middleware: Token valid, loading profile...');
   req.accessToken = token;
   req.user = await loadProfile(user);
+  console.log('Auth middleware: User loaded', { userId: req.user?.id });
   return next();
 }
 

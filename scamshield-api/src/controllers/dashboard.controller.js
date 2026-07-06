@@ -3,7 +3,11 @@ const dashboardService = require('../services/dashboard.service');
 const { sendSuccess, sendError } = require('../utils/response');
 
 exports.getStats = asyncHandler(async (req, res) => {
+  console.log('Dashboard stats request:', { userId: req.user?.id, user: req.user });
+  
   const result = await dashboardService.getDashboardStats(req.user);
+
+  console.log('Dashboard stats result:', result);
 
   if (!result.success) {
     return sendError(res, result.message, result.statusCode || 400, result.errors || null);
@@ -13,7 +17,11 @@ exports.getStats = asyncHandler(async (req, res) => {
 });
 
 exports.getRecent = asyncHandler(async (req, res) => {
+  console.log('Dashboard recent request:', { userId: req.user?.id, user: req.user });
+  
   const result = await dashboardService.getDashboardRecent(req.user);
+
+  console.log('Dashboard recent result:', result);
 
   if (!result.success) {
     return sendError(res, result.message, result.statusCode || 400, result.errors || null);
@@ -23,7 +31,11 @@ exports.getRecent = asyncHandler(async (req, res) => {
 });
 
 exports.getCategories = asyncHandler(async (req, res) => {
+  console.log('Dashboard categories request:', { userId: req.user?.id, user: req.user });
+  
   const result = await dashboardService.getDashboardCategories(req.user);
+
+  console.log('Dashboard categories result:', result);
 
   if (!result.success) {
     return sendError(res, result.message, result.statusCode || 400, result.errors || null);
