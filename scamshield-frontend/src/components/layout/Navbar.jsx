@@ -56,6 +56,13 @@ function Navbar() {
         {user ? (
           <>
             <div className="hidden items-center gap-1 md:flex">
+              <NavLink
+                to="/feed"
+                className="flex items-center gap-1 text-slate-300 hover:text-white transition-colors text-sm"
+              >
+                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                Live Feed
+              </NavLink>
               {navItems.map((item) => (
                 <NavLink key={item.to} to={item.to} className={linkClass}>
                   {item.label}
@@ -93,6 +100,13 @@ function Navbar() {
           </>
         ) : (
           <div className="hidden items-center gap-3 md:flex">
+            <NavLink
+              to="/feed"
+              className="flex items-center gap-1 text-slate-300 hover:text-white transition-colors text-sm"
+            >
+              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+              Live Feed
+            </NavLink>
             <Link
               to="/login"
               className="btn-base rounded-lg px-4 py-2 text-sm font-medium text-slate-300 transition-colors hover:text-white hover:bg-slate-800"
@@ -112,6 +126,20 @@ function Navbar() {
       {user && isOpen ? (
         <div className="border-t border-slate-800 bg-slate-950 px-4 pb-4 md:hidden mobile-menu-animate">
           <div className="flex flex-col gap-1 pt-4">
+            <NavLink
+              to="/feed"
+              className={({ isActive }) =>
+                `rounded-lg px-4 py-3 text-sm font-medium transition-colors flex items-center gap-2 ${
+                  isActive
+                    ? "bg-blue-500/20 text-white"
+                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                }`
+              }
+              onClick={() => setIsOpen(false)}
+            >
+              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+              Live Feed
+            </NavLink>
             {navItems.map((item) => (
               <NavLink
                 key={item.to}

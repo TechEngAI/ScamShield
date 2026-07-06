@@ -86,6 +86,7 @@ async function processMessageAsync(body, from, messageSid, numMedia, fullBody) {
     // STEP 4: Send "processing" message
     await sendWhatsAppMessage(
       from,
+      '🛡️ *ScamShield NG — Nigerian Fraud Detection*\n' +
       '🔍 *ScamShield NG is analysing your message...*\n\nThis usually takes 2-3 seconds. We go send you the result now.'
     );
 

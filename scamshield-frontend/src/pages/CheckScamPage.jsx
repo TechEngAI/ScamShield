@@ -71,6 +71,7 @@ function CheckScamPage() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [extractedText, setExtractedText] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   const canSubmit =
     activeTab === "text" ? messageText.trim().length > 0 && !isAnalysing : selectedImage && !isAnalysing;
@@ -452,6 +453,35 @@ function CheckScamPage() {
                 </div>
               </aside>
             </div>
+
+            {/* Share Report Section */}
+            {result && result.id && (
+              <div className="mt-4 bg-slate-800 border border-slate-700 rounded-xl p-4">
+                <p className="text-white font-medium mb-2">📤 Share this report</p>
+                <p className="text-slate-400 text-sm mb-3">
+                  Warn your contacts by sharing a link to this analysis
+                </p>
+                <div className="flex gap-2">
+                  <input
+                    readOnly
+                    value={`${window.location.origin}/report/${result.id}`}
+                    className="flex-1 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-slate-300 text-sm"
+                  />
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        `${window.location.origin}/report/${result.id}`
+                      );
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap transition-colors"
+                  >
+                    {copied ? "✓ Copied!" : "Copy Link"}
+                  </button>
+                </div>
+              </div>
+            )}
           </section>
         ) : null}
 

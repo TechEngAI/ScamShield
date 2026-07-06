@@ -338,3 +338,69 @@ exports.checkBulkScam = asyncHandler(async (req, res) => {
 
   return sendSuccess(res, { results: processed, summary }, 'bulk analysis complete');
 });
+
+/**
+ * Returns last 20 scam detections for public feed
+ * No auth required — only returns safe fields (no user_id, no email)
+ */
+exports.getPublicFeed = asyncHandler(async (req, res) => {
+  const { data, error } = await supabaseAdmin
+    .from('scam_checks')
+    .select(
+      'id, verdict, confidence_score, scam_category, impersonated_bank, language_detected, source, created_at, message_text'
+    )
+    .eq('verdict', 'scam')
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  if (error) {
+    logger.error('Failed to fetch public feed', { error: error.message });
+    return sendError(res, 'failed to fetch feed', 500);
+  }
+
+  // Truncate message_text to 80 chars for privacy
+  const safeFeed = (data || []).map(item => ({
+    ...item,
+    message_text: item.message_text
+      ? item.message_text.substring(0, 80) + (item.message_text.length > 80 ? '...' : '')
+      : null
+  }));
+
+  return sendSuccess(res, safeFeed, 'feed retrieved successfully');
+});
+
+/**
+ * Returns a single scam check report by ID for public sharing
+ * No auth required — only returns safe fields
+ */
+exports.getPublicReport = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  // Validate UUID format
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(id)) {
+    return sendError(res, 'invalid report id', 400);
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('scam_checks')
+    .select(
+      'id, verdict, confidence_score, scam_category, impersonated_bank, explanation, language_detected, red_flags, safe_to_click, recommended_action, source, created_at, message_text'
+    )
+    .eq('id', id)
+    .single();
+
+  if (error || !data) {
+    return sendError(res, 'report not found', 404);
+  }
+
+  // Truncate message for privacy
+  const safeReport = {
+    ...data,
+    message_text: data.message_text
+      ? data.message_text.substring(0, 120) + (data.message_text.length > 120 ? '...' : '')
+      : null
+  };
+
+  return sendSuccess(res, safeReport, 'report retrieved successfully');
+});

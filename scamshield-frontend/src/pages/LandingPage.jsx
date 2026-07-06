@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { BrainCircuit, Languages, ShieldCheck, MessageSquare, Image, Smartphone } from "lucide-react";
+import { MessageSquare, Image, Smartphone, Phone, Plug } from "lucide-react";
 import useAuth from "../hooks/useAuth";
 
 const features = [
@@ -19,6 +19,20 @@ const features = [
     title: "WhatsApp Bot",
     description: "Forward suspicious messages directly on WhatsApp for instant scam detection.",
   },
+  {
+    icon: Phone,
+    title: "USSD Access",
+    description: "Feature phone users can check scams via USSD — no smartphone or data needed",
+    link: "/ussd",
+    linkText: "Try simulator",
+  },
+  {
+    icon: Plug,
+    title: "Browser Extension",
+    description: "Coming soon: automatic scam detection while you browse WhatsApp Web and Gmail",
+    link: "/extension",
+    linkText: "See mockup",
+  },
 ];
 
 const steps = [
@@ -36,6 +50,11 @@ const steps = [
     number: "3",
     title: "Get an instant verdict in Pidgin or English",
     description: "Receive clear guidance on whether to respond or ignore",
+  },
+  {
+    number: "4",
+    title: "Share warnings with your contacts",
+    description: "Generate shareable report links to warn others about scams",
   },
 ];
 
@@ -123,21 +142,29 @@ function LandingPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-black sm:text-4xl">How ScamShield NG Protects You</h2>
-            <p className="mt-4 text-lg text-slate-400">Three powerful ways to stay safe from financial fraud</p>
+            <p className="mt-4 text-lg text-slate-400">Five powerful ways to stay safe from financial fraud</p>
           </div>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-5">
             {features.map((feature) => {
               const Icon = feature.icon;
               return (
                 <article
                   key={feature.title}
-                  className="card-hover rounded-xl border border-slate-800 bg-slate-900 p-8"
+                  className="card-hover rounded-xl border border-slate-800 bg-slate-900 p-8 flex flex-col"
                 >
                   <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-blue-500/10">
                     <Icon className="h-6 w-6 text-blue-400" aria-hidden="true" />
                   </div>
                   <h3 className="mt-4 text-xl font-bold">{feature.title}</h3>
-                  <p className="mt-3 text-slate-400 leading-relaxed">{feature.description}</p>
+                  <p className="mt-3 text-slate-400 leading-relaxed flex-1">{feature.description}</p>
+                  {feature.link && (
+                    <Link
+                      to={feature.link}
+                      className="mt-4 text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors"
+                    >
+                      {feature.linkText} →
+                    </Link>
+                  )}
                 </article>
               );
             })}
@@ -150,9 +177,9 @@ function LandingPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-black sm:text-4xl">How It Works</h2>
-            <p className="mt-4 text-lg text-slate-400">Get protected in three simple steps</p>
+            <p className="mt-4 text-lg text-slate-400">Get protected in four simple steps</p>
           </div>
-          <div className="grid gap-8 md:grid-cols-3">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {steps.map((step, index) => (
               <div key={step.number} className="relative">
                 <div className="flex items-start gap-4">
@@ -164,11 +191,6 @@ function LandingPage() {
                     <p className="mt-2 text-slate-400">{step.description}</p>
                   </div>
                 </div>
-                {index < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-5 left-10 w-full h-0.5 bg-slate-800 -z-10">
-                    <div className="h-full w-full border-t-2 border-dashed border-slate-700" />
-                  </div>
-                )}
               </div>
             ))}
           </div>
@@ -195,10 +217,23 @@ function LandingPage() {
               </svg>
               <span className="font-bold">ScamShield NG</span>
             </div>
-            <p className="text-center text-slate-400">Protecting Nigerians from financial fraud</p>
-            <p className="text-slate-500 text-sm">Built for the AI Guardrails Hackathon</p>
+            <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
+              <Link to="/ussd" className="text-slate-400 hover:text-white transition-colors">
+                USSD Simulator
+              </Link>
+              <Link to="/extension" className="text-slate-400 hover:text-white transition-colors">
+                Browser Extension
+              </Link>
+              <Link to="/feed" className="text-slate-400 hover:text-white transition-colors">
+                Live Feed
+              </Link>
+            </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-slate-800 text-center text-sm text-slate-500">
+          <div className="mt-8 pt-8 border-t border-slate-800 text-center">
+            <p className="text-slate-400">Protecting Nigerians from financial fraud</p>
+            <p className="text-slate-500 text-sm mt-2">Built for the AI Guardrails Hackathon</p>
+          </div>
+          <div className="mt-4 text-center text-sm text-slate-500">
             © 2025 ScamShield NG. Free to use.
           </div>
         </div>

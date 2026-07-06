@@ -3,7 +3,7 @@ const { body, query } = require('express-validator');
 const authMiddleware = require('../middleware/auth.middleware');
 const validate = require('../middleware/validate.middleware');
 const scamController = require('../controllers/scam.controller');
-const { scamCheckLimiter, historyLimiter } = require('../middleware/rateLimit.middleware');
+const { scamCheckLimiter, historyLimiter, generalLimiter } = require('../middleware/rateLimit.middleware');
 const { upload } = require('../middleware/upload.middleware');
 
 const router = express.Router();
@@ -59,5 +59,19 @@ router.get(
 );
 
 router.get('/patterns', authMiddleware, historyLimiter, scamController.getPatterns);
+
+// GET /api/scam/feed — public real-time feed (no auth required)
+router.get(
+  '/feed',
+  generalLimiter,
+  scamController.getPublicFeed
+);
+
+// GET /api/scam/report/:id — public report (no auth required)
+router.get(
+  '/report/:id',
+  generalLimiter,
+  scamController.getPublicReport
+);
 
 module.exports = router;

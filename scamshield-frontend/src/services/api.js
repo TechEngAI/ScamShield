@@ -171,4 +171,16 @@ export async function checkBulkScam(messages) {
   return unwrap(response);
 }
 
+// Public feed — no auth needed
+export const getPublicFeed = async () => {
+  const response = await api.get("/api/scam/feed");
+  return unwrap(response);
+};
+
+// Public report — no auth needed
+export const getPublicReport = async (id) => {
+  const response = await api.get(`/api/scam/report/${id}`);
+  return unwrap(response);
+};
+
 export default api;
