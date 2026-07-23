@@ -39,10 +39,13 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
-export const getErrorMessage = (error, fallback = "Something went wrong. Please try again.") =>
+export const getErrorMessage = (
+  error,
+  fallback = "Something went wrong. Please try again.",
+) =>
   error?.response?.data?.message ||
   error?.response?.data?.error ||
   error?.message ||
@@ -58,7 +61,14 @@ export const getErrorMessage = (error, fallback = "Something went wrong. Please 
  * @param {string} password
  * @returns {Promise<Object>}
  */
-export async function registerUser(firstName, lastName, email, phoneNumber, username, password) {
+export async function registerUser(
+  firstName,
+  lastName,
+  email,
+  phoneNumber,
+  username,
+  password,
+) {
   const response = await api.post("/api/auth/register", {
     first_name: firstName,
     last_name: lastName,
@@ -173,6 +183,27 @@ export async function getDashboardCategories() {
 
 export async function getBankLeaderboard() {
   const response = await api.get("/api/dashboard/banks");
+  return unwrap(response);
+}
+
+// Developer API endpoints
+export async function generateApiKey(name) {
+  const response = await api.post("/api/developer/keys", { name });
+  return unwrap(response);
+}
+
+export async function listApiKeys() {
+  const response = await api.get("/api/developer/keys");
+  return unwrap(response);
+}
+
+export async function revokeApiKey(id) {
+  const response = await api.delete(`/api/developer/keys/${id}`);
+  return unwrap(response);
+}
+
+export async function getDeveloperUsage() {
+  const response = await api.get("/api/developer/usage");
   return unwrap(response);
 }
 

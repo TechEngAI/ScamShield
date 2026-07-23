@@ -36,8 +36,17 @@ function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/95 backdrop-blur-sm">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <Link to="/" className="flex items-center gap-3 text-white transition-transform hover:scale-105">
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" className="flex-shrink-0">
+        <Link
+          to="/"
+          className="flex items-center gap-3 text-white transition-transform hover:scale-105"
+        >
+          <svg
+            width="32"
+            height="32"
+            viewBox="0 0 32 32"
+            fill="none"
+            className="flex-shrink-0"
+          >
             <path
               d="M16 2L4 7V15C4 21.6 9.2 27.8 16 30C22.8 27.8 28 21.6 28 15V7L16 2Z"
               fill="#3B82F6"
@@ -50,7 +59,9 @@ function Navbar() {
               strokeLinejoin="round"
             />
           </svg>
-          <span className="text-xl font-bold tracking-tight">ScamShield NG</span>
+          <span className="text-xl font-bold tracking-tight">
+            ScamShield NG
+          </span>
         </Link>
 
         {user ? (
@@ -63,6 +74,12 @@ function Navbar() {
                 <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
                 Live Feed
               </NavLink>
+              <NavLink
+                to="/developer"
+                className="rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 text-slate-300 hover:text-white hover:bg-slate-800/50"
+              >
+                🔑 API
+              </NavLink>
               {navItems.map((item) => (
                 <NavLink key={item.to} to={item.to} className={linkClass}>
                   {item.label}
@@ -73,7 +90,8 @@ function Navbar() {
             <div className="hidden items-center gap-4 md:flex">
               <div className="flex items-center gap-2">
                 <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm">
-                  {user.username?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
+                  {user.username?.charAt(0).toUpperCase() ||
+                    user.email?.charAt(0).toUpperCase()}
                 </div>
                 <span className="max-w-40 truncate text-sm font-medium text-slate-300">
                   {user.username || user.email}
@@ -95,7 +113,11 @@ function Navbar() {
               className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-700 text-slate-300 transition-colors hover:bg-slate-800 md:hidden"
               aria-label="Open navigation menu"
             >
-              {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {isOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
             </button>
           </>
         ) : (
@@ -106,6 +128,12 @@ function Navbar() {
             >
               <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
               Live Feed
+            </NavLink>
+            <NavLink
+              to="/api-docs"
+              className="text-slate-300 hover:text-white transition-colors text-sm"
+            >
+              Developers
             </NavLink>
             <Link
               to="/login"
@@ -140,6 +168,32 @@ function Navbar() {
               <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
               Live Feed
             </NavLink>
+            <NavLink
+              to="/api-docs"
+              className={({ isActive }) =>
+                `rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                  isActive
+                    ? "bg-blue-500/20 text-white"
+                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                }`
+              }
+              onClick={() => setIsOpen(false)}
+            >
+              Developers
+            </NavLink>
+            <NavLink
+              to="/developer"
+              className={({ isActive }) =>
+                `rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                  isActive
+                    ? "bg-blue-500/20 text-white"
+                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                }`
+              }
+              onClick={() => setIsOpen(false)}
+            >
+              🔑 API
+            </NavLink>
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
@@ -159,11 +213,16 @@ function Navbar() {
             <div className="mt-4 border-t border-slate-800 pt-4">
               <div className="flex items-center gap-3 mb-4">
                 <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold">
-                  {user.username?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
+                  {user.username?.charAt(0).toUpperCase() ||
+                    user.email?.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-white">{user.username || user.email}</p>
-                  <p className="text-xs text-slate-400">{user.first_name} {user.last_name}</p>
+                  <p className="text-sm font-medium text-white">
+                    {user.username || user.email}
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    {user.first_name} {user.last_name}
+                  </p>
                 </div>
               </div>
               <button
