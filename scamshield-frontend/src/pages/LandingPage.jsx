@@ -7,29 +7,34 @@ const features = [
   {
     icon: MessageSquare,
     title: "AI Text Analysis",
-    description: "Paste any suspicious message and get an instant verdict powered by AI trained on Nigerian fraud patterns.",
+    description:
+      "Paste any suspicious message and get an instant verdict powered by AI trained on Nigerian fraud patterns.",
   },
   {
     icon: Image,
     title: "Screenshot Detection",
-    description: "Upload a screenshot — we extract the text and analyse it for scam indicators automatically.",
+    description:
+      "Upload a screenshot — we extract the text and analyse it for scam indicators automatically.",
   },
   {
     icon: Smartphone,
     title: "WhatsApp Bot",
-    description: "Forward suspicious messages directly on WhatsApp for instant scam detection.",
+    description:
+      "Forward suspicious messages directly on WhatsApp for instant scam detection.",
   },
   {
     icon: Phone,
     title: "USSD Access",
-    description: "Feature phone users can check scams via USSD — no smartphone or data needed",
+    description:
+      "Feature phone users can check scams via USSD — no smartphone or data needed",
     link: "/ussd",
     linkText: "Try simulator",
   },
   {
     icon: Plug,
     title: "Browser Extension",
-    description: "Coming soon: automatic scam detection while you browse WhatsApp Web and Gmail",
+    description:
+      "Coming soon: automatic scam detection while you browse WhatsApp Web and Gmail",
     link: "/extension",
     linkText: "See mockup",
   },
@@ -44,7 +49,8 @@ const steps = [
   {
     number: "2",
     title: "Our AI analyses it against 100+ Nigerian scam patterns",
-    description: "We check for bank impersonation, fake links, and urgency tactics",
+    description:
+      "We check for bank impersonation, fake links, and urgency tactics",
   },
   {
     number: "3",
@@ -81,8 +87,8 @@ function LandingPage() {
               <span className="gradient-text">Nigerian Financial Scams</span>
             </h1>
             <p className="mt-6 max-w-2xl mx-auto text-lg leading-8 text-slate-400">
-              ScamShield NG uses AI to detect fraudulent messages, fake bank alerts, and BVN phishing — in Pidgin
-              and English.
+              ScamShield NG uses AI to detect fraudulent messages, fake bank
+              alerts, and BVN phishing — in Pidgin and English.
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
               <Link
@@ -98,21 +104,21 @@ function LandingPage() {
                 {user ? "View Dashboard" : "Already have an account? Sign in"}
               </Link>
             </div>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-slate-500">
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-6 text-slate-500 text-xs">
               <span className="flex items-center gap-1">
-                <span className="text-lg">🛡️</span> Free
+                <span className="text-green-400">✓</span> CBN consumer
+                protection aligned
               </span>
-              <span className="text-slate-700">•</span>
               <span className="flex items-center gap-1">
-                <span className="text-lg">🤖</span> AI-Powered
+                <span className="text-green-400">✓</span> NDPR compliant
               </span>
-              <span className="text-slate-700">•</span>
               <span className="flex items-center gap-1">
-                <span className="text-lg">🇳🇬</span> Built for Nigeria
+                <span className="text-green-400">✓</span> 150 Nigerian fraud
+                patterns
               </span>
-              <span className="text-slate-700">•</span>
               <span className="flex items-center gap-1">
-                <span className="text-lg">📱</span> Works on WhatsApp
+                <span className="text-green-400">✓</span> University of Lagos
+                built
               </span>
             </div>
           </div>
@@ -124,15 +130,21 @@ function LandingPage() {
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:grid-cols-3 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="text-4xl font-black text-blue-400">₦9.5B</p>
-            <p className="mt-2 text-sm font-medium text-slate-400">lost to fraud annually (FITC 2023)</p>
+            <p className="mt-2 text-sm font-medium text-slate-400">
+              lost to fraud annually (FITC 2023)
+            </p>
           </div>
           <div className="text-center">
             <p className="text-4xl font-black text-blue-400">120M+</p>
-            <p className="mt-2 text-sm font-medium text-slate-400">mobile money users at risk</p>
+            <p className="mt-2 text-sm font-medium text-slate-400">
+              mobile money users at risk
+            </p>
           </div>
           <div className="text-center">
             <p className="text-4xl font-black text-blue-400">10</p>
-            <p className="mt-2 text-sm font-medium text-slate-400">scam categories detected</p>
+            <p className="mt-2 text-sm font-medium text-slate-400">
+              scam categories detected
+            </p>
           </div>
         </div>
       </section>
@@ -141,8 +153,12 @@ function LandingPage() {
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-black sm:text-4xl">How ScamShield NG Protects You</h2>
-            <p className="mt-4 text-lg text-slate-400">Five powerful ways to stay safe from financial fraud</p>
+            <h2 className="text-3xl font-black sm:text-4xl">
+              How ScamShield NG Protects You
+            </h2>
+            <p className="mt-4 text-lg text-slate-400">
+              Five powerful ways to stay safe from financial fraud
+            </p>
           </div>
           <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-5">
             {features.map((feature) => {
@@ -153,10 +169,15 @@ function LandingPage() {
                   className="card-hover rounded-xl border border-slate-800 bg-slate-900 p-8 flex flex-col"
                 >
                   <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-blue-500/10">
-                    <Icon className="h-6 w-6 text-blue-400" aria-hidden="true" />
+                    <Icon
+                      className="h-6 w-6 text-blue-400"
+                      aria-hidden="true"
+                    />
                   </div>
                   <h3 className="mt-4 text-xl font-bold">{feature.title}</h3>
-                  <p className="mt-3 text-slate-400 leading-relaxed flex-1">{feature.description}</p>
+                  <p className="mt-3 text-slate-400 leading-relaxed flex-1">
+                    {feature.description}
+                  </p>
                   {feature.link && (
                     <Link
                       to={feature.link}
@@ -172,12 +193,75 @@ function LandingPage() {
         </div>
       </section>
 
+      {/* Institutional alignment section */}
+      <section className="py-12 border-y border-slate-800">
+        <div className="max-w-5xl mx-auto px-4">
+          <p className="text-center text-slate-500 text-sm uppercase tracking-widest mb-8 font-medium">
+            Built for Nigeria's financial ecosystem
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
+            <div className="flex flex-col items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+              <div className="w-14 h-14 bg-slate-800 border border-slate-700 rounded-xl flex items-center justify-center text-2xl">
+                🏛️
+              </div>
+              <span className="text-slate-400 text-xs font-medium text-center">
+                CBN Guidelines
+                <br />
+                Aligned
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+              <div className="w-14 h-14 bg-slate-800 border border-slate-700 rounded-xl flex items-center justify-center text-2xl">
+                ⚖️
+              </div>
+              <span className="text-slate-400 text-xs font-medium text-center">
+                EFCC Anti-Fraud
+                <br />
+                Standards
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+              <div className="w-14 h-14 bg-slate-800 border border-slate-700 rounded-xl flex items-center justify-center text-2xl">
+                💻
+              </div>
+              <span className="text-slate-400 text-xs font-medium text-center">
+                NITDA Digital
+                <br />
+                Framework
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+              <div className="w-14 h-14 bg-slate-800 border border-slate-700 rounded-xl flex items-center justify-center text-2xl">
+                🎓
+              </div>
+              <span className="text-slate-400 text-xs font-medium text-center">
+                University of Lagos
+                <br />
+                Innovation
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+              <div className="w-14 h-14 bg-slate-800 border border-slate-700 rounded-xl flex items-center justify-center text-2xl">
+                🔒
+              </div>
+              <span className="text-slate-400 text-xs font-medium text-center">
+                NDPR Data
+                <br />
+                Protection
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works Section */}
       <section className="py-20 bg-slate-900/30">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-black sm:text-4xl">How It Works</h2>
-            <p className="mt-4 text-lg text-slate-400">Get protected in four simple steps</p>
+            <p className="mt-4 text-lg text-slate-400">
+              Get protected in four simple steps
+            </p>
           </div>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {steps.map((step, index) => (
@@ -218,20 +302,33 @@ function LandingPage() {
               <span className="font-bold">ScamShield NG</span>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
-              <Link to="/ussd" className="text-slate-400 hover:text-white transition-colors">
+              <Link
+                to="/ussd"
+                className="text-slate-400 hover:text-white transition-colors"
+              >
                 USSD Simulator
               </Link>
-              <Link to="/extension" className="text-slate-400 hover:text-white transition-colors">
+              <Link
+                to="/extension"
+                className="text-slate-400 hover:text-white transition-colors"
+              >
                 Browser Extension
               </Link>
-              <Link to="/feed" className="text-slate-400 hover:text-white transition-colors">
+              <Link
+                to="/feed"
+                className="text-slate-400 hover:text-white transition-colors"
+              >
                 Live Feed
               </Link>
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-slate-800 text-center">
-            <p className="text-slate-400">Protecting Nigerians from financial fraud</p>
-            <p className="text-slate-500 text-sm mt-2">Built for the AI Guardrails Hackathon</p>
+            <p className="text-slate-400">
+              Protecting Nigerians from financial fraud
+            </p>
+            <p className="text-slate-500 text-sm mt-2">
+              Built for the AI Guardrails Hackathon
+            </p>
           </div>
           <div className="mt-4 text-center text-sm text-slate-500">
             © 2025 ScamShield NG. Free to use.

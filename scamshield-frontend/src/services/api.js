@@ -156,6 +156,16 @@ export async function getDashboardRecent() {
   return unwrap(response);
 }
 
+export async function completeOnboarding() {
+  const response = await api.post("/api/dashboard/complete-onboarding");
+  return unwrap(response);
+}
+
+export async function getProtectionScore() {
+  const response = await api.get("/api/dashboard/protection-score");
+  return unwrap(response);
+}
+
 export async function getDashboardCategories() {
   const response = await api.get("/api/dashboard/categories");
   return unwrap(response);

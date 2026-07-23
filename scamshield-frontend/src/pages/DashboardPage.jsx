@@ -19,13 +19,16 @@ import {
 } from "recharts";
 import useAuth from "../hooks/useAuth";
 import {
+  completeOnboarding,
   getBankLeaderboard,
   getDashboardCategories,
   getDashboardRecent,
   getDashboardStats,
   getErrorMessage,
+  getProtectionScore,
 } from "../services/api";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
+import OnboardingModal from "../components/OnboardingModal";
 import VerdictBadge from "../components/ui/VerdictBadge";
 
 const formatDate = (value) =>
@@ -90,6 +93,9 @@ function DashboardPage() {
   const [bankLeaderboard, setBankLeaderboard] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [protectionScore, setProtectionScore] = useState(0);
+  const [scoreData, setScoreData] = useState(null);
 
   // Per-section loading states for progressive rendering
   const [statsLoading, setStatsLoading] = useState(true);
@@ -103,6 +109,18 @@ function DashboardPage() {
 
   useEffect(() => {
     if (!user) return;
+
+    getProtectionScore()
+      .then((data) => {
+        setProtectionScore(data.score || 0);
+        setScoreData(data);
+        if (!data.onboarding_completed) {
+          setShowOnboarding(true);
+        }
+      })
+      .catch(() => {
+        // ignore onboarding fetch failures
+      });
 
     let isMounted = true;
     setError("");
@@ -238,6 +256,24 @@ function DashboardPage() {
   return (
     <main className="min-h-screen bg-slate-950 px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
+        {showOnboarding && (
+          <OnboardingModal
+            onComplete={async () => {
+              setShowOnboarding(false);
+              try {
+                const data = await getProtectionScore();
+                setProtectionScore(data.score || 0);
+                setScoreData(data);
+              } catch (err) {
+                console.error(
+                  "Failed to refresh protection score after onboarding",
+                  err,
+                );
+              }
+            }}
+          />
+        )}
+
         <div className="mb-8 flex flex-col gap-4 text-white sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-black uppercase tracking-widest text-blue-400">
@@ -257,6 +293,74 @@ function DashboardPage() {
           >
             Check a Message
           </Link>
+        </div>
+
+        <div className="mb-6 rounded-3xl border border-blue-700/40 bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 p-6 shadow-lg shadow-blue-500/10">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-slate-400 text-sm">Your Protection Score</p>
+              <div className="mt-2 flex items-end gap-3">
+                <span className="text-5xl font-black text-white">
+                  {protectionScore}
+                </span>
+                <span className="text-slate-400">/ 100</span>
+              </div>
+              <p className="mt-3 max-w-2xl text-sm text-slate-400">
+                {protectionScore < 40
+                  ? "Keep checking messages to increase your score."
+                  : protectionScore < 70
+                    ? "Good progress — you are building protection."
+                    : protectionScore < 90
+                      ? "Strong protection — keep it up."
+                      : "🏆 Maximum protection achieved"}
+              </p>
+            </div>
+            <div className="relative w-28 h-28 flex-shrink-0">
+              <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="42"
+                  fill="none"
+                  stroke="#0f172a"
+                  strokeWidth="10"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="42"
+                  fill="none"
+                  stroke="#3B82F6"
+                  strokeWidth="10"
+                  strokeLinecap="round"
+                  strokeDasharray={`${2 * Math.PI * 42}`}
+                  strokeDashoffset={`${2 * Math.PI * 42 * (1 - protectionScore / 100)}`}
+                  style={{ transition: "stroke-dashoffset 1s ease" }}
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-2xl font-black text-white">
+                  {protectionScore}
+                </span>
+              </div>
+            </div>
+          </div>
+          {scoreData && (
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 border-t border-slate-800 pt-5 text-sm text-slate-400">
+              <div className="rounded-2xl bg-slate-950/80 p-4">
+                <p className="text-2xl font-bold text-white">
+                  {scoreData.total_checks || 0}
+                </p>
+                <p className="text-slate-400 text-xs mt-1">Messages checked</p>
+              </div>
+              <div className="rounded-2xl bg-slate-950/80 p-4">
+                <p className="text-2xl font-bold text-red-400">
+                  {scoreData.scams_caught || 0}
+                </p>
+                <p className="text-slate-400 text-xs mt-1">Scams caught</p>
+              </div>
+            </div>
+          )}
         </div>
 
         {statsLoading && recentLoading && categoriesLoading && banksLoading ? (
@@ -403,55 +507,51 @@ function DashboardPage() {
                         />
                       ))}
                     </div>
+                  ) : !recent.length ? (
+                    <div className="rounded-lg bg-slate-950 p-6 text-center text-sm font-semibold text-slate-500">
+                      No recent checks yet.
+                    </div>
                   ) : (
-                    <>
-                      <table className="min-w-full divide-y divide-slate-800 text-sm">
-                        <thead>
-                          <tr className="text-left text-xs font-black uppercase tracking-wide text-slate-500">
-                            <th className="py-3 pr-4">Message</th>
-                            <th className="py-3 pr-4">Verdict</th>
-                            <th className="py-3 pr-4">Confidence</th>
-                            <th className="py-3 pr-4">Date/time</th>
-                            <th className="py-3">Source</th>
+                    <table className="min-w-full divide-y divide-slate-800 text-sm">
+                      <thead>
+                        <tr className="text-left text-xs font-black uppercase tracking-wide text-slate-500">
+                          <th className="py-3 pr-4">Message</th>
+                          <th className="py-3 pr-4">Verdict</th>
+                          <th className="py-3 pr-4">Confidence</th>
+                          <th className="py-3 pr-4">Date/time</th>
+                          <th className="py-3">Source</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800">
+                        {recent.map((item) => (
+                          <tr
+                            key={
+                              item.id ||
+                              `${item.created_at}-${item.message_text}`
+                            }
+                            className="text-slate-300 hover:bg-slate-800/50 transition-colors"
+                          >
+                            <td className="max-w-64 py-3 pr-4 font-semibold">
+                              {truncate(item.message_text || item.message)}
+                            </td>
+                            <td className="py-3 pr-4">
+                              <VerdictBadge
+                                verdict={item.verdict || "suspicious"}
+                              />
+                            </td>
+                            <td className="py-3 pr-4 font-black">
+                              {Math.round(Number(item.confidence_score) || 0)}%
+                            </td>
+                            <td className="whitespace-nowrap py-3 pr-4">
+                              {formatDate(item.created_at)}
+                            </td>
+                            <td className="py-3 font-bold capitalize">
+                              {item.source || "web"}
+                            </td>
                           </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-800">
-                          {recent.map((item) => (
-                            <tr
-                              key={
-                                item.id ||
-                                `${item.created_at}-${item.message_text}`
-                              }
-                              className="text-slate-300 hover:bg-slate-800/50 transition-colors"
-                            >
-                              <td className="max-w-64 py-3 pr-4 font-semibold">
-                                {truncate(item.message_text || item.message)}
-                              </td>
-                              <td className="py-3 pr-4">
-                                <VerdictBadge
-                                  verdict={item.verdict || "suspicious"}
-                                />
-                              </td>
-                              <td className="py-3 pr-4 font-black">
-                                {Math.round(Number(item.confidence_score) || 0)}
-                                %
-                              </td>
-                              <td className="whitespace-nowrap py-3 pr-4">
-                                {formatDate(item.created_at)}
-                              </td>
-                              <td className="py-3 font-bold capitalize">
-                                {item.source || "web"}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                      {!recent.length ? (
-                        <div className="rounded-lg bg-slate-950 p-6 text-center text-sm font-semibold text-slate-500">
-                          No recent checks yet.
-                        </div>
-                      ) : null}
-                    </>
+                        ))}
+                      </tbody>
+                    </table>
                   )}
                 </div>
               </div>
