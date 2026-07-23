@@ -14,15 +14,20 @@ app.set('trust proxy', 1);
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, curl, Postman)
+    // Allow requests with no origin (Postman, curl, mobile apps)
     if (!origin) return callback(null, true);
 
-    // Allow chrome extensions
+    // Allow all Chrome extensions
     if (origin.startsWith('chrome-extension://')) {
       return callback(null, true);
     }
 
-    // Allow listed origins from env var
+    // Allow Firefox extensions
+    if (origin.startsWith('moz-extension://')) {
+      return callback(null, true);
+    }
+
+    // Allow listed origins from environment variable
     const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
       .split(',')
       .map(o => o.trim())
@@ -32,11 +37,13 @@ const corsOptions = {
       return callback(null, true);
     }
 
-    return callback(new Error('Not allowed by CORS'));
+    console.warn('CORS blocked origin:', origin);
+    return callback(new Error(`CORS: origin ${origin} not allowed`));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200,
 };
 
 app.use(helmet());
