@@ -13,19 +13,30 @@ const app = express();
 app.set('trust proxy', 1);
 
 const corsOptions = {
-  origin(origin, callback) {
-    const allowedOrigins = new Set([...(config.ALLOWED_ORIGINS || []), 'http://localhost:3000']);
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
 
-    if (!origin || allowedOrigins.has(origin)) {
+    // Allow chrome extensions
+    if (origin.startsWith('chrome-extension://')) {
+      return callback(null, true);
+    }
+
+    // Allow listed origins from env var
+    const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+      .split(',')
+      .map(o => o.trim())
+      .filter(Boolean);
+
+    if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
 
     return callback(new Error('Not allowed by CORS'));
   },
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  optionsSuccessStatus: 200,
 };
 
 app.use(helmet());

@@ -347,7 +347,7 @@ exports.getPublicFeed = asyncHandler(async (req, res) => {
   const { data, error } = await supabaseAdmin
     .from('scam_checks')
     .select(
-      'id, verdict, confidence_score, scam_category, impersonated_bank, language_detected, source, created_at, message_text'
+      'id, verdict, confidence_score, scam_category, impersonated_bank, language_detected, source, created_at, message_text, red_flags'
     )
     .eq('verdict', 'scam')
     .order('created_at', { ascending: false })
