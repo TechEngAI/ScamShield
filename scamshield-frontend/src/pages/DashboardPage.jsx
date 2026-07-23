@@ -1,9 +1,30 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { AlertTriangle, CheckCircle2, History, Search, ShieldX, TrendingUp } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  History,
+  Search,
+  ShieldX,
+  TrendingUp,
+} from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import useAuth from "../hooks/useAuth";
-import { getBankLeaderboard, getDashboardCategories, getDashboardRecent, getDashboardStats, getErrorMessage } from "../services/api";
+import {
+  getBankLeaderboard,
+  getDashboardCategories,
+  getDashboardRecent,
+  getDashboardStats,
+  getErrorMessage,
+} from "../services/api";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import VerdictBadge from "../components/ui/VerdictBadge";
 
@@ -36,26 +57,29 @@ const normalizeList = (payload) => {
 const normalizeCategories = (payload) => {
   if (Array.isArray(payload)) return payload;
   const source = payload?.categories || payload || {};
-  return Object.entries(source).map(([category, count]) => ({ category, count }));
+  return Object.entries(source).map(([category, count]) => ({
+    category,
+    count,
+  }));
 };
 
 const categoryLabels = {
-  bvn_phishing: 'BVN Phishing',
-  fake_bank_alert: 'Fake Bank Alert',
-  otp_theft: 'OTP Theft',
-  prize_scam: 'Prize Scam',
-  cbn_impersonation: 'CBN Impersonation',
-  loan_scam: 'Loan Scam',
-  job_scam: 'Job Scam',
-  investment_scam: 'Investment Scam',
-  sim_swap: 'SIM Swap',
-  whatsapp_bot_impersonation: 'WhatsApp Impersonation',
-  fake_job_offer: 'Fake Job Offer',
-  fake_investment: 'Fake Investment',
-  government_impersonation: 'Government Impersonation',
-  telecom_scam: 'Telecom Scam',
-  romance_scam: 'Romance Scam',
-  crypto_scam: 'Crypto Scam',
+  bvn_phishing: "BVN Phishing",
+  fake_bank_alert: "Fake Bank Alert",
+  otp_theft: "OTP Theft",
+  prize_scam: "Prize Scam",
+  cbn_impersonation: "CBN Impersonation",
+  loan_scam: "Loan Scam",
+  job_scam: "Job Scam",
+  investment_scam: "Investment Scam",
+  sim_swap: "SIM Swap",
+  whatsapp_bot_impersonation: "WhatsApp Impersonation",
+  fake_job_offer: "Fake Job Offer",
+  fake_investment: "Fake Investment",
+  government_impersonation: "Government Impersonation",
+  telecom_scam: "Telecom Scam",
+  romance_scam: "Romance Scam",
+  crypto_scam: "Crypto Scam",
 };
 
 function DashboardPage() {
@@ -92,7 +116,9 @@ function DashboardPage() {
       })
       .catch(() => {
         if (!isMounted) return;
-        setError((e) => e || 'Dashboard is taking longer than usual. Please retry.');
+        setError(
+          (e) => e || "Dashboard is taking longer than usual. Please retry.",
+        );
       })
       .finally(() => {
         if (!isMounted) return;
@@ -106,7 +132,9 @@ function DashboardPage() {
       })
       .catch(() => {
         if (!isMounted) return;
-        setError((e) => e || 'Dashboard is taking longer than usual. Please retry.');
+        setError(
+          (e) => e || "Dashboard is taking longer than usual. Please retry.",
+        );
       })
       .finally(() => {
         if (!isMounted) return;
@@ -120,7 +148,9 @@ function DashboardPage() {
       })
       .catch(() => {
         if (!isMounted) return;
-        setError((e) => e || 'Dashboard is taking longer than usual. Please retry.');
+        setError(
+          (e) => e || "Dashboard is taking longer than usual. Please retry.",
+        );
       })
       .finally(() => {
         if (!isMounted) return;
@@ -134,7 +164,9 @@ function DashboardPage() {
       })
       .catch(() => {
         if (!isMounted) return;
-        setError((e) => e || 'Dashboard is taking longer than usual. Please retry.');
+        setError(
+          (e) => e || "Dashboard is taking longer than usual. Please retry.",
+        );
       })
       .finally(() => {
         if (!isMounted) return;
@@ -144,7 +176,12 @@ function DashboardPage() {
     // When all sections finish, clear overall loading
     const finishChecker = setInterval(() => {
       if (!isMounted) return;
-      if (!statsLoading && !recentLoading && !categoriesLoading && !banksLoading) {
+      if (
+        !statsLoading &&
+        !recentLoading &&
+        !categoriesLoading &&
+        !banksLoading
+      ) {
         setIsLoading(false);
         clearInterval(finishChecker);
       }
@@ -203,9 +240,12 @@ function DashboardPage() {
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 flex flex-col gap-4 text-white sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-black uppercase tracking-widest text-blue-400">Dashboard</p>
+            <p className="text-sm font-black uppercase tracking-widest text-blue-400">
+              Dashboard
+            </p>
             <h1 className="text-3xl font-bold text-white">
-              Welcome back, {user?.username || user?.first_name || user?.email} 👋
+              Welcome back, {user?.username || user?.first_name || user?.email}{" "}
+              👋
             </h1>
             <p className="text-slate-400 mt-1">
               {user?.first_name} {user?.last_name} • {user?.email}
@@ -223,8 +263,12 @@ function DashboardPage() {
           <div className="flex flex-col items-center justify-center py-16 gap-4">
             <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
             <div className="text-center">
-              <p className="text-white font-medium mb-1">Loading your dashboard...</p>
-              <p className="text-slate-400 text-sm">First load may take up to 30 seconds after inactivity</p>
+              <p className="text-white font-medium mb-1">
+                Loading your dashboard...
+              </p>
+              <p className="text-slate-400 text-sm">
+                First load may take up to 30 seconds after inactivity
+              </p>
             </div>
           </div>
         ) : error ? (
@@ -232,8 +276,13 @@ function DashboardPage() {
             <div className="flex items-start gap-3">
               <span className="text-red-400 text-xl flex-shrink-0">⚠️</span>
               <div className="flex-1">
-                <p className="text-red-400 font-medium mb-1">Dashboard taking longer than usual</p>
-                <p className="text-red-300 text-sm mb-4">This happens when the server restarts after inactivity. Your data is safe — click retry to load it.</p>
+                <p className="text-red-400 font-medium mb-1">
+                  Dashboard taking longer than usual
+                </p>
+                <p className="text-red-300 text-sm mb-4">
+                  This happens when the server restarts after inactivity. Your
+                  data is safe — click retry to load it.
+                </p>
                 <button
                   onClick={() => window.location.reload()}
                   className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
@@ -246,47 +295,60 @@ function DashboardPage() {
         ) : (
           <>
             <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {statsLoading ? (
-                [1, 2, 3, 4].map((i) => (
-                  <div key={i} className="skeleton rounded-xl border border-slate-800 bg-slate-900 p-6 animate-pulse">
-                    <div className="h-4 bg-slate-800 rounded w-1/2 mb-4"></div>
-                    <div className="h-10 bg-slate-800 rounded w-1/3"></div>
-                  </div>
-                ))
-              ) : (
-                statCards.map((card) => {
-                  const Icon = card.icon;
-                  return (
-                    <article
-                      key={card.label}
-                      className="card-hover rounded-xl border border-slate-800 bg-slate-900 p-6"
+              {statsLoading
+                ? [1, 2, 3, 4].map((i) => (
+                    <div
+                      key={i}
+                      className="skeleton rounded-xl border border-slate-800 bg-slate-900 p-6 animate-pulse"
                     >
-                      <Icon className={`h-7 w-7 ${card.className}`} aria-hidden="true" />
-                      <p className={`mt-5 text-3xl font-black ${card.valueClass}`}>
-                        {Number(card.value).toLocaleString()}
-                      </p>
-                      <p className="mt-1 text-sm font-semibold text-slate-400">{card.label}</p>
-                    </article>
-                  );
-                })
-              )}
+                      <div className="h-4 bg-slate-800 rounded w-1/2 mb-4"></div>
+                      <div className="h-10 bg-slate-800 rounded w-1/3"></div>
+                    </div>
+                  ))
+                : statCards.map((card) => {
+                    const Icon = card.icon;
+                    return (
+                      <article
+                        key={card.label}
+                        className="card-hover rounded-xl border border-slate-800 bg-slate-900 p-6"
+                      >
+                        <Icon
+                          className={`h-7 w-7 ${card.className}`}
+                          aria-hidden="true"
+                        />
+                        <p
+                          className={`mt-5 text-3xl font-black ${card.valueClass}`}
+                        >
+                          {Number(card.value).toLocaleString()}
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-slate-400">
+                          {card.label}
+                        </p>
+                      </article>
+                    );
+                  })}
             </section>
 
             <section className="mt-6 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
               <div className="rounded-xl border border-slate-800 bg-slate-900 p-6">
                 <div className="flex items-center gap-2 mb-5">
                   <TrendingUp className="h-5 w-5 text-blue-400" />
-                  <h2 className="text-lg font-bold text-white">Scams by category</h2>
+                  <h2 className="text-lg font-bold text-white">
+                    Scams by category
+                  </h2>
                 </div>
                 <div className="mt-5 h-80">
                   {categoriesLoading ? (
                     <div className="h-full rounded-lg bg-slate-900 p-4 animate-pulse" />
                   ) : categories.length ? (
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={categories.map((item) => ({
-                        ...item,
-                        display_category: categoryLabels[item.category] || item.category,
-                      }))}>
+                      <BarChart
+                        data={categories.map((item) => ({
+                          ...item,
+                          display_category:
+                            categoryLabels[item.category] || item.category,
+                        }))}
+                      >
                         <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                         <XAxis
                           dataKey="display_category"
@@ -306,14 +368,18 @@ function DashboardPage() {
                             color: "#F8FAFC",
                           }}
                         />
-                        <Bar dataKey="count" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                        <Bar
+                          dataKey="count"
+                          fill="#3B82F6"
+                          radius={[4, 4, 0, 0]}
+                        />
                       </BarChart>
                     </ResponsiveContainer>
-                    ) : (
-                      <div className="flex h-full items-center justify-center rounded-lg bg-slate-950 text-sm font-semibold text-slate-500">
-                        No category data yet.
-                      </div>
-                    )}
+                  ) : (
+                    <div className="flex h-full items-center justify-center rounded-lg bg-slate-950 text-sm font-semibold text-slate-500">
+                      No category data yet.
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -321,50 +387,71 @@ function DashboardPage() {
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <History className="h-5 w-5 text-blue-400" />
-                    <h2 className="text-lg font-bold text-white">Recent activity</h2>
+                    <h2 className="text-lg font-bold text-white">
+                      Recent activity
+                    </h2>
                   </div>
                 </div>
 
                 <div className="mt-5 overflow-x-auto">
                   {recentLoading ? (
                     <div className="space-y-3">
-                      {[1,2,3,4].map(i => (
-                        <div key={i} className="h-12 bg-slate-800 rounded animate-pulse" />
+                      {[1, 2, 3, 4].map((i) => (
+                        <div
+                          key={i}
+                          className="h-12 bg-slate-800 rounded animate-pulse"
+                        />
                       ))}
                     </div>
                   ) : (
-                  <table className="min-w-full divide-y divide-slate-800 text-sm">
-                    <thead>
-                      <tr className="text-left text-xs font-black uppercase tracking-wide text-slate-500">
-                        <th className="py-3 pr-4">Message</th>
-                        <th className="py-3 pr-4">Verdict</th>
-                        <th className="py-3 pr-4">Confidence</th>
-                        <th className="py-3 pr-4">Date/time</th>
-                        <th className="py-3">Source</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-800">
-                      {recent.map((item) => (
-                        <tr
-                          key={item.id || `${item.created_at}-${item.message_text}`}
-                          className="text-slate-300 hover:bg-slate-800/50 transition-colors"
-                        >
-                          <td className="max-w-64 py-3 pr-4 font-semibold">{truncate(item.message_text || item.message)}</td>
-                          <td className="py-3 pr-4">
-                            <VerdictBadge verdict={item.verdict || "suspicious"} />
-                          </td>
-                          <td className="py-3 pr-4 font-black">{Math.round(Number(item.confidence_score) || 0)}%</td>
-                          <td className="whitespace-nowrap py-3 pr-4">{formatDate(item.created_at)}</td>
-                          <td className="py-3 font-bold capitalize">{item.source || "web"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  {!recent.length ? (
-                    <div className="rounded-lg bg-slate-950 p-6 text-center text-sm font-semibold text-slate-500">
-                      No recent checks yet.
-                    </div>
-                  ) : null}
+                    <>
+                      <table className="min-w-full divide-y divide-slate-800 text-sm">
+                        <thead>
+                          <tr className="text-left text-xs font-black uppercase tracking-wide text-slate-500">
+                            <th className="py-3 pr-4">Message</th>
+                            <th className="py-3 pr-4">Verdict</th>
+                            <th className="py-3 pr-4">Confidence</th>
+                            <th className="py-3 pr-4">Date/time</th>
+                            <th className="py-3">Source</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800">
+                          {recent.map((item) => (
+                            <tr
+                              key={
+                                item.id ||
+                                `${item.created_at}-${item.message_text}`
+                              }
+                              className="text-slate-300 hover:bg-slate-800/50 transition-colors"
+                            >
+                              <td className="max-w-64 py-3 pr-4 font-semibold">
+                                {truncate(item.message_text || item.message)}
+                              </td>
+                              <td className="py-3 pr-4">
+                                <VerdictBadge
+                                  verdict={item.verdict || "suspicious"}
+                                />
+                              </td>
+                              <td className="py-3 pr-4 font-black">
+                                {Math.round(Number(item.confidence_score) || 0)}
+                                %
+                              </td>
+                              <td className="whitespace-nowrap py-3 pr-4">
+                                {formatDate(item.created_at)}
+                              </td>
+                              <td className="py-3 font-bold capitalize">
+                                {item.source || "web"}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      {!recent.length ? (
+                        <div className="rounded-lg bg-slate-950 p-6 text-center text-sm font-semibold text-slate-500">
+                          No recent checks yet.
+                        </div>
+                      ) : null}
+                    </>
                   )}
                 </div>
               </div>
@@ -374,8 +461,12 @@ function DashboardPage() {
             {banksLoading ? (
               <section className="mt-6 rounded-xl border border-slate-800 bg-slate-900 p-6">
                 <div className="mb-5">
-                  <h2 className="text-lg font-bold text-white">🏦 Most Impersonated Banks</h2>
-                  <p className="text-sm text-slate-400 mt-1">Banks most frequently targeted by scammers</p>
+                  <h2 className="text-lg font-bold text-white">
+                    🏦 Most Impersonated Banks
+                  </h2>
+                  <p className="text-sm text-slate-400 mt-1">
+                    Banks most frequently targeted by scammers
+                  </p>
                 </div>
                 <div className="space-y-3">
                   {[1, 2, 3].map((i) => (
@@ -390,20 +481,31 @@ function DashboardPage() {
             ) : bankLeaderboard.length > 0 ? (
               <section className="mt-6 rounded-xl border border-slate-800 bg-slate-900 p-6">
                 <div className="mb-5">
-                  <h2 className="text-lg font-bold text-white">🏦 Most Impersonated Banks</h2>
-                  <p className="text-sm text-slate-400 mt-1">Banks most frequently targeted by scammers</p>
+                  <h2 className="text-lg font-bold text-white">
+                    🏦 Most Impersonated Banks
+                  </h2>
+                  <p className="text-sm text-slate-400 mt-1">
+                    Banks most frequently targeted by scammers
+                  </p>
                 </div>
                 <div className="space-y-3">
                   {bankLeaderboard.map((bank) => (
-                    <div key={bank.bank_name} className="flex items-center gap-3">
-                      <span className="text-slate-300 text-sm w-24 flex-shrink-0">{bank.bank_name}</span>
+                    <div
+                      key={bank.bank_name}
+                      className="flex items-center gap-3"
+                    >
+                      <span className="text-slate-300 text-sm w-24 flex-shrink-0">
+                        {bank.bank_name}
+                      </span>
                       <div className="flex-1 bg-slate-700 rounded-full h-3">
                         <div
                           className="bg-red-500 h-3 rounded-full transition-all duration-700"
                           style={{ width: `${bank.percentage}%` }}
                         />
                       </div>
-                      <span className="text-red-400 text-sm font-medium w-12 text-right">{bank.count}</span>
+                      <span className="text-red-400 text-sm font-medium w-12 text-right">
+                        {bank.count}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -411,11 +513,16 @@ function DashboardPage() {
             ) : (
               <section className="mt-6 rounded-xl border border-slate-800 bg-slate-900 p-6">
                 <div className="mb-5">
-                  <h2 className="text-lg font-bold text-white">🏦 Most Impersonated Banks</h2>
-                  <p className="text-sm text-slate-400 mt-1">Banks most frequently targeted by scammers</p>
+                  <h2 className="text-lg font-bold text-white">
+                    🏦 Most Impersonated Banks
+                  </h2>
+                  <p className="text-sm text-slate-400 mt-1">
+                    Banks most frequently targeted by scammers
+                  </p>
                 </div>
                 <div className="flex items-center justify-center rounded-lg bg-slate-950 p-6 text-sm font-semibold text-slate-500">
-                  No bank impersonation data yet. Check more messages to see patterns.
+                  No bank impersonation data yet. Check more messages to see
+                  patterns.
                 </div>
               </section>
             )}
