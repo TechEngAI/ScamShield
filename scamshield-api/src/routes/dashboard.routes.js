@@ -12,5 +12,7 @@ router.get('/stats', dashboardController.getStats);
 router.get('/recent', dashboardController.getRecent);
 router.get('/categories', dashboardController.getCategories);
 router.get('/banks', dashboardController.getBankLeaderboard);
+router.post('/complete-onboarding', dashboardController.completeOnboarding);
+router.get('/protection-score', dashboardController.getProtectionScore);
 
 module.exports = router;

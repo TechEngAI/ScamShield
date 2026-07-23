@@ -1,6 +1,7 @@
 const asyncHandler = require('../utils/asyncHandler');
 const { supabaseAdmin } = require('../config/supabase');
 const scamService = require('../services/scam.service');
+const dashboardService = require('../services/dashboard.service');
 const { analyzeImageForScam } = require('../services/vision.service');
 const { sendSuccess, sendError } = require('../utils/response');
 const logger = require('../utils/logger');
@@ -72,6 +73,8 @@ exports.checkScam = asyncHandler(async (req, res) => {
       if (queryData) {
         savedData = queryData;
       }
+
+      await dashboardService.updateProtectionScore(userId);
     }
   } catch (dbError) {
     console.error('Database insert exception:', dbError);

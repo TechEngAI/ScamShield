@@ -205,9 +205,64 @@ async function getBankImpersonationLeaderboard() {
   }
 }
 
+/**
+ * Recalculates and updates a user's personal protection score
+ * Score increases with usage: checks done, scams caught, account age
+ * Max score: 100
+ * @param {string} userId
+ * @returns {Promise<number>} new score
+ */
+async function updateProtectionScore(userId) {
+  if (!userId) return 0;
+
+  const { data: checks, error } = await supabaseAdmin
+    .from('scam_checks')
+    .select('verdict, created_at')
+    .eq('user_id', userId);
+
+  if (error) {
+    logger.error('Failed to fetch scam checks for protection score', { error: error.message, userId });
+    return 0;
+  }
+
+  const totalChecks = checks?.length || 0;
+  const scamsCaught = checks?.filter((c) => c.verdict === 'scam').length || 0;
+
+  const checkPoints = Math.min(totalChecks * 3, 40);
+  const scamPoints = Math.min(scamsCaught * 5, 40);
+  const basePoints = 20;
+  const newScore = Math.min(basePoints + checkPoints + scamPoints, 100);
+
+  await supabaseAdmin
+    .from('profiles')
+    .update({
+      protection_score: newScore,
+      total_checks_count: totalChecks,
+      scams_caught_count: scamsCaught,
+    })
+    .eq('id', userId);
+
+  return newScore;
+}
+
+/**
+ * Marks user onboarding as complete
+ * @param {string} userId
+ */
+async function completeOnboarding(userId) {
+  if (!userId) return;
+
+  await supabaseAdmin
+    .from('profiles')
+    .update({ onboarding_completed: true })
+    .eq('id', userId);
+}
+
 module.exports = {
   getDashboardStats,
   getDashboardRecent,
   getDashboardCategories,
   getBankImpersonationLeaderboard,
+  updateProtectionScore,
+  completeOnboarding,
 };
