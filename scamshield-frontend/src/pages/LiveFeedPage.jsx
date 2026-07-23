@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import toast from "react-hot-toast";
-import { getPublicFeed, getErrorMessage } from "../services/api";
+import { getPublicFeed } from "../services/api";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import VerdictBadge from "../components/ui/VerdictBadge";
 
@@ -25,30 +24,31 @@ function LiveFeedPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [lastUpdated, setLastUpdated] = useState("");
-  const [previousFeedLength, setPreviousFeedLength] = useState(0);
   const [newItemsCount, setNewItemsCount] = useState(0);
+  const previousFeedLength = useRef(0);
+  const newItemsTimeout = useRef(null);
 
   const fetchFeed = async () => {
     try {
       const data = await getPublicFeed();
       const currentLength = Array.isArray(data) ? data.length : 0;
-      
-      // Check for new items
-      if (previousFeedLength > 0 && currentLength > previousFeedLength) {
-        const newCount = currentLength - previousFeedLength;
+
+      if (previousFeedLength.current > 0 && currentLength > previousFeedLength.current) {
+        const newCount = currentLength - previousFeedLength.current;
         setNewItemsCount(newCount);
-        toast.success(`${newCount} new scam${newCount > 1 ? 's' : ''} detected`);
-        
-        // Clear the notification after 5 seconds
-        setTimeout(() => setNewItemsCount(0), 5000);
+        if (newItemsTimeout.current) {
+          clearTimeout(newItemsTimeout.current);
+        }
+        newItemsTimeout.current = setTimeout(() => setNewItemsCount(0), 5000);
       }
-      
+
+      previousFeedLength.current = currentLength;
       setFeed(Array.isArray(data) ? data : []);
-      setPreviousFeedLength(currentLength);
-      setLastUpdated(new Date().toLocaleTimeString());
+      setLastUpdated(new Date().toLocaleTimeString("en-NG", { hour: "2-digit", minute: "2-digit" }));
       setError("");
     } catch (requestError) {
-      setError(getErrorMessage(requestError, "Could not load feed. Please try again."));
+      console.error("Feed refresh failed", requestError);
+      setError("Could not load live feed. Please try again shortly.");
     } finally {
       setIsLoading(false);
     }
@@ -58,15 +58,24 @@ function LiveFeedPage() {
     document.title = "Live Scam Feed | ScamShield NG";
     fetchFeed();
 
-    const interval = setInterval(() => {
-      fetchFeed();
-    }, 10000); // refresh every 10 seconds
-
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchFeed, 10000);
+    return () => {
+      clearInterval(interval);
+      if (newItemsTimeout.current) {
+        clearTimeout(newItemsTimeout.current);
+      }
+    };
   }, []);
 
-  const uniqueBanks = [...new Set(feed.map(f => f.impersonated_bank).filter(Boolean))];
-  const pidginCount = feed.filter(f => f.language_detected === 'pidgin' || f.language_detected === 'mixed').length;
+  const uniqueBanks = useMemo(
+    () => [...new Set(feed.map((f) => f.impersonated_bank).filter(Boolean))],
+    [feed]
+  );
+
+  const pidginCount = useMemo(
+    () => feed.filter((f) => f.language_detected === "pidgin" || f.language_detected === "mixed").length,
+    [feed]
+  );
 
   return (
     <main className="min-h-screen bg-slate-950 px-4 py-8 sm:px-6 lg:px-8">

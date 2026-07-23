@@ -32,6 +32,25 @@ const languageLabels = {
   mixed: "Mixed",
 };
 
+const categoryLabels = {
+  bvn_phishing: "BVN Phishing",
+  fake_bank_alert: "Fake Bank Alert",
+  otp_theft: "OTP Theft",
+  prize_scam: "Prize Scam",
+  cbn_impersonation: "CBN Impersonation",
+  loan_scam: "Loan Scam",
+  job_scam: "Job Scam",
+  investment_scam: "Investment Scam",
+  sim_swap: "SIM Swap",
+  whatsapp_bot_impersonation: "WhatsApp Impersonation",
+  fake_job_offer: "Fake Job Offer",
+  fake_investment: "Fake Investment",
+  government_impersonation: "Government Impersonation",
+  telecom_scam: "Telecom Scam",
+  romance_scam: "Romance Scam",
+  crypto_scam: "Crypto Scam",
+};
+
 const getConfidenceExplanation = (score, verdict, redFlags) => {
   const flagCount = redFlags?.length || 0;
 
@@ -51,7 +70,7 @@ const getConfidenceExplanation = (score, verdict, redFlags) => {
 
   if (verdict === 'safe') {
     if (score >= 80) {
-      return `Our AI found no scam patterns in this message (${score}% confidence it is safe). It does not match any of our 100+ Nigerian fraud templates.`;
+      return `Our AI found no scam patterns in this message (${score}% confidence it is safe). It does not match any of our 150+ Nigerian fraud templates.`;
     } else {
       return `This message appears safe (${score}% confidence) but our certainty is moderate. When in doubt, contact your bank through official channels.`;
     }
@@ -447,7 +466,7 @@ function CheckScamPage() {
                   </span>
                   {result.scam_category ? (
                     <span className="rounded-lg bg-slate-950 px-3 py-1.5 text-xs font-semibold text-slate-300">
-                      Category: {result.scam_category}
+                      Category: {categoryLabels[result.scam_category] || result.scam_category}
                     </span>
                   ) : null}
                 </div>

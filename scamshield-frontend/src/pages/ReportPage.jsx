@@ -105,7 +105,7 @@ function ReportPage() {
         <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 mb-6">
           {/* Large verdict badge centered */}
           <div className="text-center mb-6">
-            <VerdictBadge verdict={report.verdict} size="large" />
+            <VerdictBadge verdict={report.verdict} size="lg" />
           </div>
 
           {/* Confidence */}

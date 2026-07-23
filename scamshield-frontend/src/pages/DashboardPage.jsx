@@ -39,6 +39,25 @@ const normalizeCategories = (payload) => {
   return Object.entries(source).map(([category, count]) => ({ category, count }));
 };
 
+const categoryLabels = {
+  bvn_phishing: 'BVN Phishing',
+  fake_bank_alert: 'Fake Bank Alert',
+  otp_theft: 'OTP Theft',
+  prize_scam: 'Prize Scam',
+  cbn_impersonation: 'CBN Impersonation',
+  loan_scam: 'Loan Scam',
+  job_scam: 'Job Scam',
+  investment_scam: 'Investment Scam',
+  sim_swap: 'SIM Swap',
+  whatsapp_bot_impersonation: 'WhatsApp Impersonation',
+  fake_job_offer: 'Fake Job Offer',
+  fake_investment: 'Fake Investment',
+  government_impersonation: 'Government Impersonation',
+  telecom_scam: 'Telecom Scam',
+  romance_scam: 'Romance Scam',
+  crypto_scam: 'Crypto Scam',
+};
+
 function DashboardPage() {
   const { user, isLoading: authLoading } = useAuth();
   const [stats, setStats] = useState(null);
@@ -48,6 +67,12 @@ function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Per-section loading states for progressive rendering
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [recentLoading, setRecentLoading] = useState(true);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [banksLoading, setBanksLoading] = useState(true);
+
   useEffect(() => {
     document.title = "Dashboard | ScamShield NG";
   }, []);
@@ -56,37 +81,78 @@ function DashboardPage() {
     if (!user) return;
 
     let isMounted = true;
+    setError("");
+    setIsLoading(true);
 
-    async function loadDashboard() {
-      setIsLoading(true);
-      setError("");
-      try {
-        const [statsData, recentData, categoryData, bankData] = await Promise.all([
-          getDashboardStats(),
-          getDashboardRecent(),
-          getDashboardCategories(),
-          getBankLeaderboard(),
-        ]);
-
+    // Load each section independently so UI appears progressively.
+    getDashboardStats()
+      .then((data) => {
         if (!isMounted) return;
-        setStats(statsData);
-        setRecent(normalizeList(recentData).slice(0, 10));
-        setCategories(normalizeCategories(categoryData));
-        setBankLeaderboard(Array.isArray(bankData) ? bankData : []);
-      } catch (requestError) {
-        if (isMounted) {
-          setError(getErrorMessage(requestError, "Could not load dashboard data."));
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    }
+        if (data) setStats(data);
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setError((e) => e || 'Dashboard is taking longer than usual. Please retry.');
+      })
+      .finally(() => {
+        if (!isMounted) return;
+        setStatsLoading(false);
+      });
 
-    loadDashboard();
+    getDashboardRecent()
+      .then((data) => {
+        if (!isMounted) return;
+        setRecent(normalizeList(data).slice(0, 10));
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setError((e) => e || 'Dashboard is taking longer than usual. Please retry.');
+      })
+      .finally(() => {
+        if (!isMounted) return;
+        setRecentLoading(false);
+      });
+
+    getDashboardCategories()
+      .then((data) => {
+        if (!isMounted) return;
+        setCategories(normalizeCategories(data));
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setError((e) => e || 'Dashboard is taking longer than usual. Please retry.');
+      })
+      .finally(() => {
+        if (!isMounted) return;
+        setCategoriesLoading(false);
+      });
+
+    getBankLeaderboard()
+      .then((data) => {
+        if (!isMounted) return;
+        setBankLeaderboard(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setError((e) => e || 'Dashboard is taking longer than usual. Please retry.');
+      })
+      .finally(() => {
+        if (!isMounted) return;
+        setBanksLoading(false);
+      });
+
+    // When all sections finish, clear overall loading
+    const finishChecker = setInterval(() => {
+      if (!isMounted) return;
+      if (!statsLoading && !recentLoading && !categoriesLoading && !banksLoading) {
+        setIsLoading(false);
+        clearInterval(finishChecker);
+      }
+    }, 250);
+
     return () => {
       isMounted = false;
+      clearInterval(finishChecker);
     };
   }, [user]);
 
@@ -153,37 +219,57 @@ function DashboardPage() {
           </Link>
         </div>
 
-        {isLoading ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="skeleton rounded-xl border border-slate-800 bg-slate-900 p-6">
-                <div className="h-4 bg-slate-800 rounded w-1/2 mb-4"></div>
-                <div className="h-10 bg-slate-800 rounded w-1/3"></div>
-              </div>
-            ))}
+        {statsLoading && recentLoading && categoriesLoading && banksLoading ? (
+          <div className="flex flex-col items-center justify-center py-16 gap-4">
+            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="text-center">
+              <p className="text-white font-medium mb-1">Loading your dashboard...</p>
+              <p className="text-slate-400 text-sm">First load may take up to 30 seconds after inactivity</p>
+            </div>
           </div>
         ) : error ? (
-          <div className="rounded-xl border border-red-900/50 bg-red-950/50 p-5 text-sm font-semibold text-red-400">
-            {error}
+          <div className="bg-red-950 border border-red-800 rounded-xl p-6 mb-6">
+            <div className="flex items-start gap-3">
+              <span className="text-red-400 text-xl flex-shrink-0">⚠️</span>
+              <div className="flex-1">
+                <p className="text-red-400 font-medium mb-1">Dashboard taking longer than usual</p>
+                <p className="text-red-300 text-sm mb-4">This happens when the server restarts after inactivity. Your data is safe — click retry to load it.</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                >
+                  🔄 Retry
+                </button>
+              </div>
+            </div>
           </div>
         ) : (
           <>
             <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {statCards.map((card) => {
-                const Icon = card.icon;
-                return (
-                  <article
-                    key={card.label}
-                    className="card-hover rounded-xl border border-slate-800 bg-slate-900 p-6"
-                  >
-                    <Icon className={`h-7 w-7 ${card.className}`} aria-hidden="true" />
-                    <p className={`mt-5 text-3xl font-black ${card.valueClass}`}>
-                      {Number(card.value).toLocaleString()}
-                    </p>
-                    <p className="mt-1 text-sm font-semibold text-slate-400">{card.label}</p>
-                  </article>
-                );
-              })}
+              {statsLoading ? (
+                [1, 2, 3, 4].map((i) => (
+                  <div key={i} className="skeleton rounded-xl border border-slate-800 bg-slate-900 p-6 animate-pulse">
+                    <div className="h-4 bg-slate-800 rounded w-1/2 mb-4"></div>
+                    <div className="h-10 bg-slate-800 rounded w-1/3"></div>
+                  </div>
+                ))
+              ) : (
+                statCards.map((card) => {
+                  const Icon = card.icon;
+                  return (
+                    <article
+                      key={card.label}
+                      className="card-hover rounded-xl border border-slate-800 bg-slate-900 p-6"
+                    >
+                      <Icon className={`h-7 w-7 ${card.className}`} aria-hidden="true" />
+                      <p className={`mt-5 text-3xl font-black ${card.valueClass}`}>
+                        {Number(card.value).toLocaleString()}
+                      </p>
+                      <p className="mt-1 text-sm font-semibold text-slate-400">{card.label}</p>
+                    </article>
+                  );
+                })
+              )}
             </section>
 
             <section className="mt-6 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
@@ -193,12 +279,17 @@ function DashboardPage() {
                   <h2 className="text-lg font-bold text-white">Scams by category</h2>
                 </div>
                 <div className="mt-5 h-80">
-                  {categories.length ? (
+                  {categoriesLoading ? (
+                    <div className="h-full rounded-lg bg-slate-900 p-4 animate-pulse" />
+                  ) : categories.length ? (
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={categories}>
+                      <BarChart data={categories.map((item) => ({
+                        ...item,
+                        display_category: categoryLabels[item.category] || item.category,
+                      }))}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                         <XAxis
-                          dataKey="category"
+                          dataKey="display_category"
                           tick={{ fontSize: 11, fill: "#94A3B8" }}
                           stroke="#475569"
                         />
@@ -218,11 +309,11 @@ function DashboardPage() {
                         <Bar dataKey="count" fill="#3B82F6" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
-                  ) : (
-                    <div className="flex h-full items-center justify-center rounded-lg bg-slate-950 text-sm font-semibold text-slate-500">
-                      No category data yet.
-                    </div>
-                  )}
+                    ) : (
+                      <div className="flex h-full items-center justify-center rounded-lg bg-slate-950 text-sm font-semibold text-slate-500">
+                        No category data yet.
+                      </div>
+                    )}
                 </div>
               </div>
 
@@ -235,6 +326,13 @@ function DashboardPage() {
                 </div>
 
                 <div className="mt-5 overflow-x-auto">
+                  {recentLoading ? (
+                    <div className="space-y-3">
+                      {[1,2,3,4].map(i => (
+                        <div key={i} className="h-12 bg-slate-800 rounded animate-pulse" />
+                      ))}
+                    </div>
+                  ) : (
                   <table className="min-w-full divide-y divide-slate-800 text-sm">
                     <thead>
                       <tr className="text-left text-xs font-black uppercase tracking-wide text-slate-500">
@@ -267,12 +365,13 @@ function DashboardPage() {
                       No recent checks yet.
                     </div>
                   ) : null}
+                  )}
                 </div>
               </div>
             </section>
 
             {/* Bank Impersonation Leaderboard */}
-            {isLoading ? (
+            {banksLoading ? (
               <section className="mt-6 rounded-xl border border-slate-800 bg-slate-900 p-6">
                 <div className="mb-5">
                   <h2 className="text-lg font-bold text-white">🏦 Most Impersonated Banks</h2>
