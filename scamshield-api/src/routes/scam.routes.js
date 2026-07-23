@@ -5,13 +5,14 @@ const validate = require('../middleware/validate.middleware');
 const scamController = require('../controllers/scam.controller');
 const { scamCheckLimiter, historyLimiter, generalLimiter } = require('../middleware/rateLimit.middleware');
 const { upload } = require('../middleware/upload.middleware');
+const { apiKeyOrAuth } = require('../middleware/apiKeyAuth.middleware');
 
 const router = express.Router();
 
 router.post(
   '/check',
   scamCheckLimiter,
-  authMiddleware.optional,
+  apiKeyOrAuth,
   [
     body('message_text').notEmpty().withMessage('message_text is required').isLength({ max: 2000 }),
     body('source').optional().isIn(['web', 'whatsapp', 'sms', 'api']).withMessage('source must be web, whatsapp, sms, or api'),
