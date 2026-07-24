@@ -363,6 +363,22 @@ function DashboardPage() {
           )}
         </div>
 
+        <div className="bg-gradient-to-r from-red-900/30 to-slate-800
+          border border-red-800/50 rounded-xl p-5 mb-6
+          flex items-center justify-between">
+          <div>
+            <p className="text-white font-medium mb-1">🗺️ Nigeria Fraud Map</p>
+            <p className="text-slate-400 text-sm">
+              See scam activity across all Nigerian states in real time
+            </p>
+          </div>
+          <Link to="/map"
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2
+              rounded-lg text-sm font-medium transition-colors whitespace-nowrap">
+            View Map →
+          </Link>
+        </div>
+
         {statsLoading && recentLoading && categoriesLoading && banksLoading ? (
           <div className="flex flex-col items-center justify-center py-16 gap-4">
             <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>

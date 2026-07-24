@@ -186,6 +186,11 @@ export async function getBankLeaderboard() {
   return unwrap(response);
 }
 
+export async function getScamsByState() {
+  const response = await api.get("/api/dashboard/states");
+  return unwrap(response);
+}
+
 // Developer API endpoints
 export async function generateApiKey(name) {
   const response = await api.post("/api/developer/keys", { name });

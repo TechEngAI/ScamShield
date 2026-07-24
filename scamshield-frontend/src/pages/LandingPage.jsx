@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { MessageSquare, Image, Smartphone, Phone, Plug } from "lucide-react";
 import useAuth from "../hooks/useAuth";
+import usePWA from "../hooks/usePWA";
 
 const features = [
   {
@@ -66,6 +67,7 @@ const steps = [
 
 function LandingPage() {
   const { user } = useAuth();
+  const { isInstallable, installApp, isInstalled } = usePWA();
 
   useEffect(() => {
     document.title = "ScamShield NG | Nigerian Fraud Detection";
@@ -104,6 +106,28 @@ function LandingPage() {
                 {user ? "View Dashboard" : "Already have an account? Sign in"}
               </Link>
             </div>
+            {isInstallable && !isInstalled && (
+              <div className="mt-4 flex items-center justify-center">
+                <button
+                  onClick={installApp}
+                  className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700
+                    border border-slate-600 text-slate-300 px-5 py-2.5 rounded-xl
+                    text-sm font-medium transition-colors"
+                >
+                  <span>📱</span>
+                  Install ScamShield NG on your phone
+                  <span className="bg-green-600 text-white text-xs px-2 py-0.5
+                    rounded-full">Free</span>
+                </button>
+              </div>
+            )}
+            {isInstalled && (
+              <div className="mt-4 text-center">
+                <span className="text-green-400 text-sm">
+                  ✅ ScamShield NG is installed on your device
+                </span>
+              </div>
+            )}
             <div className="mt-6 flex flex-wrap items-center justify-center gap-6 text-slate-500 text-xs">
               <span className="flex items-center gap-1">
                 <span className="text-green-400">✓</span> CBN consumer

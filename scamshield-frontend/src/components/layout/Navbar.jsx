@@ -3,17 +3,20 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { LogOut, Menu, X } from "lucide-react";
 import toast from "react-hot-toast";
 import useAuth from "../../hooks/useAuth";
+import usePWA from "../../hooks/usePWA";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard" },
   { to: "/check", label: "Check Scam" },
   { to: "/bulk", label: "Bulk Check" },
   { to: "/history", label: "History" },
+  { to: "/map", label: "Fraud Map" },
 ];
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { isInstallable, installApp } = usePWA();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -130,6 +133,12 @@ function Navbar() {
               Live Feed
             </NavLink>
             <NavLink
+              to="/map"
+              className="text-slate-300 hover:text-white transition-colors text-sm flex items-center gap-1.5"
+            >
+              🗺️ Fraud Map
+            </NavLink>
+            <NavLink
               to="/api-docs"
               className="text-slate-300 hover:text-white transition-colors text-sm"
             >
@@ -211,6 +220,15 @@ function Navbar() {
               </NavLink>
             ))}
             <div className="mt-4 border-t border-slate-800 pt-4">
+              {isInstallable && (
+                <button
+                  onClick={installApp}
+                  className="w-full mb-4 flex items-center justify-center gap-2 bg-blue-600
+                    text-white px-4 py-3 rounded-lg text-sm font-medium"
+                >
+                  📱 Install App
+                </button>
+              )}
               <div className="flex items-center gap-3 mb-4">
                 <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold">
                   {user.username?.charAt(0).toUpperCase() ||

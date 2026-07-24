@@ -7,6 +7,7 @@ import CheckScamPage from "./pages/CheckScamPage";
 import DashboardPage from "./pages/DashboardPage";
 import DeveloperPage from "./pages/DeveloperPage";
 import ExtensionMockupPage from "./pages/ExtensionMockupPage";
+import FraudMapPage from "./pages/FraudMapPage";
 import HistoryPage from "./pages/HistoryPage";
 import LandingPage from "./pages/LandingPage";
 import LiveFeedPage from "./pages/LiveFeedPage";
@@ -32,6 +33,7 @@ function App() {
         <Route path="/ussd" element={<UssdSimulatorPage />} />
         <Route path="/extension" element={<ExtensionMockupPage />} />
         <Route path="/api-docs" element={<PublicApiDocsPage />} />
+        <Route path="/map" element={<FraudMapPage />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/check" element={<CheckScamPage />} />
