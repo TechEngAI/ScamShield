@@ -258,6 +258,52 @@ async function completeOnboarding(userId) {
     .eq('id', userId);
 }
 
+/**
+ * Returns scam counts by Nigerian state for the map
+ * @returns {Promise<Object>} { success: boolean, data: Array, message?: string }
+ */
+async function getScamsByState() {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('scam_checks')
+      .select('state_detected')
+      .eq('verdict', 'scam')
+      .not('state_detected', 'is', null);
+
+    if (error) {
+      return { success: false, message: error.message || 'failed to fetch state data' };
+    }
+
+    if (!data) {
+      return { success: true, data: [] };
+    }
+
+    // Count per state
+    const stateCounts = {};
+    data.forEach(row => {
+      if (row.state_detected) {
+        stateCounts[row.state_detected] =
+          (stateCounts[row.state_detected] || 0) + 1;
+      }
+    });
+
+    const total = Object.values(stateCounts).reduce((a, b) => a + b, 0);
+
+    const result = Object.entries(stateCounts)
+      .map(([state, count]) => ({
+        state,
+        count,
+        percentage: total > 0 ? Math.round((count / total) * 100) : 0
+      }))
+      .sort((a, b) => b.count - a.count);
+
+    return { success: true, data: result };
+  } catch (error) {
+    logger.error('Exception fetching scams by state', { error: error.message });
+    return { success: false, message: error.message || 'failed to fetch state data' };
+  }
+}
+
 module.exports = {
   getDashboardStats,
   getDashboardRecent,
@@ -265,4 +311,5 @@ module.exports = {
   getBankImpersonationLeaderboard,
   updateProtectionScore,
   completeOnboarding,
+  getScamsByState,
 };

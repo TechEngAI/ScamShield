@@ -5,6 +5,9 @@ const { dashboardLimiter } = require('../middleware/rateLimit.middleware');
 
 const router = express.Router();
 
+// GET /api/dashboard/states — scam counts by Nigerian state (public)
+router.get('/states', dashboardController.getScamsByState);
+
 router.use(authMiddleware);
 router.use(dashboardLimiter);
 

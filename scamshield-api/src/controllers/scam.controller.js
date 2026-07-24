@@ -10,15 +10,39 @@ function normalizeSource(source) {
   return ['web', 'whatsapp', 'sms', 'api'].includes(source) ? source : 'web';
 }
 
+const getStateFromIP = (ip) => {
+  // Simple IP-to-state mapping using IP ranges
+  // In production use a proper geolocation service
+  // For now return a random Nigerian state for demo purposes
+  // This will be replaced with real geolocation in production
+
+  const nigerianStates = [
+    'Lagos', 'Abuja', 'Kano', 'Rivers', 'Oyo',
+    'Kaduna', 'Ogun', 'Enugu', 'Delta', 'Anambra',
+    'Edo', 'Imo', 'Borno', 'Katsina', 'Kwara'
+  ];
+
+  // Use IP last octet to deterministically assign state for demo
+  const lastOctet = parseInt(ip.split('.').pop()) || 0;
+  return nigerianStates[lastOctet % nigerianStates.length];
+};
+
 exports.checkScam = asyncHandler(async (req, res) => {
   const { message_text: messageText, source } = req.body;
   const userId = req.user?.id || null;
-  
+
   console.log('Scam check request:', { messageText, source, userId });
-  
+
   const verdict = await scamService.analyzeMessage(messageText, userId);
 
   console.log('Analysis verdict:', verdict);
+
+  const clientIP = req.ip ||
+    req.headers['x-forwarded-for']?.split(',')[0] ||
+    req.connection.remoteAddress ||
+    '127.0.0.1';
+
+  const stateDetected = getStateFromIP(clientIP);
 
   const insertPayload = {
     message_text: messageText,
@@ -33,6 +57,7 @@ exports.checkScam = asyncHandler(async (req, res) => {
     safe_to_click: verdict.safe_to_click,
     recommended_action: verdict.recommended_action,
     source: normalizeSource(source),
+    state_detected: stateDetected
   };
 
   console.log('Insert payload:', insertPayload);
@@ -190,6 +215,13 @@ exports.checkImageScam = asyncHandler(async (req, res) => {
   const { extractedText, analysis } = await analyzeImageForScam(imageBase64, mimeType);
 
   // 4. Save to scam_checks table
+  const clientIP = req.ip ||
+    req.headers['x-forwarded-for']?.split(',')[0] ||
+    req.connection.remoteAddress ||
+    '127.0.0.1';
+
+  const stateDetected = getStateFromIP(clientIP);
+
   const insertPayload = {
     user_id: req.user?.id || null,
     message_text: extractedText,
@@ -202,7 +234,8 @@ exports.checkImageScam = asyncHandler(async (req, res) => {
     red_flags: analysis.red_flags || [],
     safe_to_click: analysis.safe_to_click ?? true,
     recommended_action: analysis.recommended_action || null,
-    source: 'web'
+    source: 'web',
+    state_detected: stateDetected
   };
 
   // Try to save to database, but don't fail the request if it fails
@@ -275,6 +308,13 @@ exports.checkBulkScam = asyncHandler(async (req, res) => {
   console.log('Bulk scam check request:', { messageCount: messages?.length, userId });
 
   // Process all messages in parallel
+  const clientIP = req.ip ||
+    req.headers['x-forwarded-for']?.split(',')[0] ||
+    req.connection.remoteAddress ||
+    '127.0.0.1';
+
+  const stateDetected = getStateFromIP(clientIP);
+
   const results = await Promise.allSettled(
     messages.map(async (messageText, index) => {
       const analysis = await scamService.analyzeMessage(messageText, userId);
@@ -294,7 +334,8 @@ exports.checkBulkScam = asyncHandler(async (req, res) => {
           red_flags: Array.isArray(analysis.red_flags) ? analysis.red_flags : [],
           safe_to_click: typeof analysis.safe_to_click === 'boolean' ? analysis.safe_to_click : true,
           recommended_action: analysis.recommended_action || null,
-          source: 'web'
+          source: 'web',
+          state_detected: stateDetected
         })
         .select()
         .single();

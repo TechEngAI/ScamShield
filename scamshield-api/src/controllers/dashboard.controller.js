@@ -90,3 +90,14 @@ exports.getProtectionScore = asyncHandler(async (req, res) => {
     200
   );
 });
+
+exports.getScamsByState = asyncHandler(async (req, res) => {
+  // Public endpoint - no auth required
+  const result = await dashboardService.getScamsByState();
+  
+  if (!result.success) {
+    return sendError(res, result.message, 400);
+  }
+  
+  return sendSuccess(res, result.data, 'state data retrieved');
+});
